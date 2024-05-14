@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Single Page Application</title>
+    <style>
+        body {
+            background-color: #1c1c1c;
+            color: #f1f1f1;
+        }
+
+        /* Basic styling for the navigation bar */
+        ul.navbar {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            background-color: black;
+            overflow: hidden;
+        }
+
+        ul.navbar li {
+            float: left;
+        }
+
+        ul.navbar li a {
+            display: block;
+            color: white;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+        }
+
+        /* Styling for the active navigation item */
+        ul.navbar li a.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        /* Styling for the content sections */
+        div.content {
+            display: none;
+            padding: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <ul class="navbar">
+        <li><a href="#home" class="active">Home</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#contact">Contact</a></li>
+    </ul>
+
+    <div id="home" class="content" style="display: block;">
+        <h1>Home</h1>
+        <p>Welcome to the Home section of the SPA!</p>
+    </div>
+
+    <div id="about" class="content">
+        <h1>About</h1>
+        <p>This is the About section of the SPA.</p>
+    </div>
+
+    <div id="contact" class="content">
+        <h1>Contact</h1>
+        <p>You can reach us through the Contact section.</p>
+    </div>
+
+    <script>
+        // Function to handle navigation item clicks
+        function navigate(event) {
+            event.preventDefault();
+
+            // Get the target section from the href attribute
+            const target = event.target.getAttribute("href");
+
+            // Hide all content sections
+            const contentSections = document.getElementsByClassName("content");
+            for (let i = 0; i < contentSections.length; i++) {
+                contentSections[i].style.display = "none";
+            }
+
+            // Display the target content section
+            document.getElementById(target.substr(1)).style.display = "block";
+
+            // Remove the "active" class from all navigation items
+            const navigationItems = document.getElementsByClassName("active");
+            for (let i = 0; i < navigationItems.length; i++) {
+                navigationItems[i].classList.remove("active");
+            }
+
+            // Add the "active" class to the clicked navigation item
+            event.target.classList.add("active");
+        }
+
+        // Attach the navigate function to all navigation items
+        const navigationItems = document.querySelectorAll("ul.navbar li a");
+        for (let i = 0; i < navigationItems.length; i++) {
+            navigationItems[i].addEventListener("click", navigate);
+        }
+    </script>
+</body>
+
+</html>

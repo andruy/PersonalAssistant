@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Voice Chat</title>
+</head>
+<body>
+  <h1>Voice Chat Room</h1>
+
+  <div id="status"></div>
+  <div id="users"></div>
+  <div id="audioContainer"></div>
+
+  <button id="connectButton">Connect</button>
+  <button id="disconnectButton" disabled>Disconnect</button>
+  <button id="muteButton">Mute Mic</button>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.js"></script>
+  <script>
+    const socket = io('http://192.168.2.152:3000');
+    let isConnected = false;
+    let isMicMuted = false;
+    let userInteraction = false;
+
+    const connectButton = document.getElementById('connectButton');
+    const disconnectButton = document.getElementById('disconnectButton');
+    const muteButton = document.getElementById('muteButton');
+    const audioContainer = document.getElementById('audioContainer');
+    let audioElement;
+
+    async function connectToServer() {
+      try {
+        if (!userInteraction) {
+          await requestUserInteraction();
+        }
+
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+        if (!audioElement) {
+          audioElement = document.createElement('audio');
+          audioElement.srcObject = stream;
+          audioElement.controls = true;
+          audioContainer.appendChild(audioElement);
+        }
+
+        const audioContext = new AudioContext();
+        const mediaStreamSource = audioContext.createMediaStreamSource(stream);
+        const scriptProcessor = audioContext.createScriptProcessor(1024, 1, 1);
+        mediaStreamSource.connect(scriptProcessor);
+        scriptProcessor.connect(audioContext.destination);
+
+        scriptProcessor.onaudioprocess = (event) => {
+          if (isMicMuted || !isConnected) {
+            return;
+          }
+
+          const voiceData = event.inputBuffer.getChannelData(0);
+          socket.emit('voiceData', voiceData);
+        };
+
+        connectButton.disabled = true;
+        disconnectButton.disabled = false;
+        muteButton.disabled = false;
+        isConnected = true;
+      } catch (error) {
+        console.error('Error accessing microphone:', error);
+      }
+    }
+
+    function disconnectFromServer() {
+      isConnected = false;
+
+      if (audioElement) {
+        audioElement.pause();
+        audioElement.srcObject = null;
+        audioContainer.removeChild(audioElement);
+        audioElement = null;
+      }
+
+      disconnectButton.disabled = true;
+      muteButton.disabled = true;
+      connectButton.disabled = false;
+    }
+
+    function toggleMicMute() {
+      isMicMuted = !isMicMuted;
+      muteButton.textContent = isMicMuted ? 'Unmute Mic' : 'Mute Mic';
+    }
+
+    async function requestUserInteraction() {
+      return new Promise((resolve) => {
+        const playAudio = () => {
+          if (audioElement) {
+            audioElement.play().then(() => {
+              userInteraction = true;
+              document.removeEventListener('touchstart', playAudio);
+              document.removeEventListener('click', playAudio);
+              resolve();
+            });
+          }
+        };
+
+        document.addEventListener('touchstart', playAudio);
+        document.addEventListener('click', playAudio);
+      });
+    }
+
+    connectButton.addEventListener('click', connectToServer);
+    disconnectButton.addEventListener('click', disconnectFromServer);
+    muteButton.addEventListener('click', toggleMicMute);
+
+    socket.on('userJoined', (clientId) => {
+      const statusElement = document.getElementById('status');
+      statusElement.textContent = `A user (ID: ${clientId}) has joined the chat room.`;
+    });
+
+    socket.on('userLeft', (clientId) => {
+      const statusElement = document.getElementById('status');
+      statusElement.textContent = `A user (ID: ${clientId}) has left the chat room.`;
+    });
+
+    socket.on('voiceData', async ({ clientId, data }) => {
+      const audioContext = new AudioContext();
+      const audioBuffer = audioContext.createBuffer(1, data.length, audioContext.sampleRate);
+      const audioData = audioBuffer.getChannelData(0);
+      audioData.set(data);
+
+      const audioSource = audioContext.createBufferSource();
+      audioSource.buffer = audioBuffer;
+      audioSource.connect(audioContext.destination);
+
+      await audioSource.start();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Assistant</title>
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/modals.css">
+    <link rel="stylesheet" href="assets/css/animations.css">
+    <link rel="stylesheet" href="assets/css/fontawesome.css">
+    <link rel="stylesheet" href="assets/css/brands.css">
+    <link rel="stylesheet" href="assets/css/solid.css">
+</head>
+
+<body>
+    <!-- Main section -->
+    <main>
+        <div class="glow-box">
+            <i class="fa-brands fa-apple"></i>
+        </div>
+        <div class="glow-box">
+            <i class="fa-brands fa-microsoft"></i>
+        </div>
+        <div class="glow-box">
+            <i class="fa-solid fa-database"></i>
+        </div>
+        <div class="glow-box">
+            <i class="fa-solid fa-car-battery"></i>
+        </div>
+    </main>
+
+    <!-- First modal -->
+    <div class="modal-background">
+        <div id="first-modal" class="modal">
+            <div class="top-modal">
+                <span class="typewriter"></span>
+                <i class="fa-solid fa-xmark close-modal"></i>
+                <i class="fa-solid fa-left-long go-back" style="display: none;"></i>
+            </div>
+            <h1>Downloader</h1>
+            <div class="mid-wrapper">
+                <div class="mid-modal">
+                    <input type="text" class="textInput" placeholder="Enter links...">
+                    <button onclick="addToFirstList()" title="add"><i class="fa-solid fa-plus"></i></button>
+                </div>
+            </div>
+            <div class="bot-modal">
+                <button class="append-button">Append items</button>
+                <button onclick="sendFirstList()">Send'em over</button>
+            </div>
+            <!-- <p class="presenter"></p> -->
+            <ul class="text-list"></ul>
+            <!-- <i class="fa-solid fa-caret-down accordion"></i> -->
+        </div>
+    </div>
+
+    <!-- Second modal -->
+    <div class="modal-background">
+        <div id="second-modal" class="modal">
+            <div class="top-modal">
+                <span class="typewriter"></span>
+                <i class="fa-solid fa-xmark close-modal"></i>
+                <i class="fa-solid fa-left-long go-back" style="display: none;"></i>
+            </div>
+            <h1>Directory</h1>
+            <div class="mid-wrapper">
+                <div class="mid-modal">
+                    <select aria-label="Directory" id="directoryList" required>
+                        <option value="" disabled selected hidden>Choose directory...</option>
+                    </select>
+                </div>
+                <div class="mid-modal">
+                    <input type="text" class="textInput" placeholder="Enter links...">
+                    <button onclick="addToSecondList()" title="add"><i class="fa-solid fa-plus"></i></button>
+                </div>
+            </div>
+            <div class="bot-modal">
+                <button class="append-button">Append items</button>
+                <button onclick="sendSecondList()">Send'em over</button>
+            </div>
+            <!-- <p class="presenter"></p> -->
+            <ul class="text-list"></ul>
+            <!-- <i class="fa-solid fa-caret-down accordion"></i> -->
+        </div>
+    </div>
+
+    <!-- Third modal -->
+    <div class="modal-background">
+        <div id="third-modal" class="modal">
+            <div class="top-modal">
+                <span class="typewriter"></span>
+                <i class="fa-solid fa-xmark close-modal"></i>
+                <i class="fa-solid fa-left-long go-back" style="display: none;"></i>
+            </div>
+            <h1>Tracker</h1>
+            <div class="mid-wrapper">
+                <div class="mid-modal">
+                    <input type="number" id="quantity" placeholder="How many?">
+                    <input type="text" class="textInput" placeholder="Item..." style="display: none;">
+                    <input type="number" id="cost" placeholder="How much?" style="display: none;">
+                    <button onclick="addToThirdList()" title="add"><i class="fa-solid fa-plus"></i></button>
+                </div>
+            </div>
+            <div class="bot-modal">
+                <button class="append-button">Append items</button>
+                <button onclick="sendThirdList()">Send'em over</button>
+            </div>
+            <!-- <p class="presenter"></p> -->
+            <ul class="text-list"></ul>
+            <!-- <i class="fa-solid fa-caret-down accordion"></i> -->
+        </div>
+    </div>
+
+    <!-- Fourth modal -->
+    <div class="modal-background">
+        <div id="fourth-modal" class="modal">
+            <div class="top-modal">
+                <span class="typewriter"></span>
+                <i class="fa-solid fa-xmark close-modal"></i>
+                <i class="fa-solid fa-left-long go-back" style="display: none;"></i>
+            </div>
+            <h1>Tasker</h1>
+            <div class="mid-wrapper">
+                <div class="mid-modal">
+                    <select aria-label="Action" id="taskList" required>
+                        <option value="" disabled selected hidden>Choose your destiny...</option>
+                        <option value="AC on">Turn AC on</option>
+                        <option value="AC off">Turn AC off</option>
+                    </select>
+                </div>
+                <div class="mid-modal">
+                        <input type="number" id="time" placeholder="...in (minutes)">
+                    <button onclick="addToFourthList()" title="add"><i class="fa-solid fa-plus"></i></button>
+                </div>
+            </div>
+            <div class="bot-modal">
+                <button class="append-button">Append value</button>
+                <button onclick="sendFourthList()">Send it over</button>
+            </div>
+            <!-- <p class="presenter"></p> -->
+            <ul class="text-list"></ul>
+            <!-- <i class="fa-solid fa-caret-down accordion"></i> -->
+        </div>
+    </div>
+
+    <script src="assets/js/script.js"></script>
+</body>
+
+</html>
