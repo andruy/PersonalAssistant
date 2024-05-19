@@ -32,7 +32,7 @@ public class ShellTaskService {
     @Value("${my.email.recipient}")
     private String receiver;
     @Value("${dir.corrections}")
-    private String file;
+    private String dataFile;
     private Map<Directory, List<String>> doNotExist;
     private ShellScriptBuilder scriptBuilder;
     private List<Directory> directories;
@@ -131,7 +131,7 @@ public class ShellTaskService {
         sb = new StringBuilder();
 
         try {
-            scanner = new Scanner(new File(file));
+            scanner = new Scanner(new File(dataFile));
             while (scanner.hasNextLine()) {
                 sb.append(scanner.nextLine());
             }
