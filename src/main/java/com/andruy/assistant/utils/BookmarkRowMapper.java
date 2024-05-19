@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
 import com.andruy.assistant.models.Bookmark;
@@ -12,7 +13,7 @@ import com.andruy.assistant.models.Bookmark;
 public class BookmarkRowMapper implements RowMapper<Bookmark> {
     @Override
     @Nullable
-    public Bookmark mapRow(ResultSet resultSet, int rowNum) throws SQLException {
+    public Bookmark mapRow(@NonNull ResultSet resultSet, int rowNum) throws SQLException {
         return new Bookmark(
             resultSet.getString("Reference"),
             resultSet.getString("Link"),

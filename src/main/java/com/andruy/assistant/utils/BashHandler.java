@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.List;
 
 import com.andruy.assistant.models.Email;
@@ -36,7 +36,7 @@ public final class BashHandler extends Thread {
         this.report = report;
         emailReport = new StringBuffer();
         input = new String[] { "./script.sh" };
-        output = Collections.synchronizedList(new ArrayList<>());
+        output = new CopyOnWriteArrayList<>();
     }
 
     @Override
