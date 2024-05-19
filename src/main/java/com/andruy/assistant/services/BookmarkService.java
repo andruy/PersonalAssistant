@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 
 import com.andruy.assistant.models.Bookmark;
 import com.andruy.assistant.utils.BookmarkRowMapper;
-import com.andruy.assistant.utils.BookmarkParser;
+import com.andruy.assistant.utils.BookmarkMapper;
 import com.andruy.assistant.utils.Queries;
 
 @Component
@@ -26,7 +26,7 @@ public class BookmarkService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
     @Autowired
-    private BookmarkParser parser;
+    private BookmarkMapper parser;
     private HttpClient httpClient;
     private HttpRequest httpRequest;
 
