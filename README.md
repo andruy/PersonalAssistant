@@ -1,1 +1,1 @@
-# assistant-backend
+# Java version of Personal Assistant
