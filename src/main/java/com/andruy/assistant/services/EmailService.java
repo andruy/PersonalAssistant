@@ -1,9 +1,7 @@
 package com.andruy.assistant.services;
 
 import java.io.UnsupportedEncodingException;
-import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.mail.Authenticator;
 import javax.mail.Message;
@@ -15,15 +13,11 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Scope;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import com.andruy.assistant.models.Email;
-import com.andruy.assistant.models.EmailTask;
 
 @Component
-@Scope("prototype")
 public class EmailService {
     @Value("${my.email.username}")
     private String username;
@@ -40,7 +34,6 @@ public class EmailService {
     private Authenticator authenticator;
     private String feedback = "Not processed";
     private String name = "Personal Assistant";
-    private static final List<String> tasks = new CopyOnWriteArrayList<>();
 
     public void sendEmail(Email email, String type) {
         // Setup properties for the mail session
@@ -128,24 +121,6 @@ public class EmailService {
             System.out.println(feedback);
 
         } catch (MessagingException | UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void addTask(EmailTask emailTask) {
-        tasks.add(emailTask.getEmail().getSubject() + " - " + emailTask.getTimestamp().plusMinutes(emailTask.getTimeframe()));
-    }
-
-    public List<String> getTasks() {
-        return tasks;
-    }
-
-    @Async
-    public void taskedEmail(EmailTask emailTask) {
-        try {
-            Thread.sleep(60000 * emailTask.getTimeframe());
-            sendEmail(emailTask.getEmail());
-        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
