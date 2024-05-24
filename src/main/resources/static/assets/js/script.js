@@ -453,7 +453,7 @@ function addToFourthList() {
     taskObj.email.subject = action;
 
     let timeValue = time.value.trim();
-    if (isNaN(Number(timeValue)) || Number(timeValue) < 1) {
+    if (isNaN(Number(timeValue)) || Number(timeValue) < 0) {
         alert("Please enter a value for time greater than zero.");
         return;
     }
@@ -470,7 +470,7 @@ function addToFourthList() {
             }
             let listItem = document.createElement("li");
             listItem.appendChild(document.createTextNode(
-                `Sending email in ${timeValue} ${timeValue > 1 ? "minutes" : "minute"}`
+                `Sending email in ${timeValue} ${(timeValue > 1 || timeValue === 0) ? "minutes" : "minute"}`
             ));
             list.appendChild(listItem);
             // Apply flip-in animation to the new list item

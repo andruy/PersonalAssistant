@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 
 import com.andruy.assistant.models.Directory;
 import com.andruy.assistant.models.Email;
+import com.andruy.assistant.models.EmailTask;
 import com.andruy.assistant.models.ShellTask;
 import com.andruy.assistant.utils.BashHandler;
 import com.andruy.assistant.utils.DirectoryList;
@@ -141,6 +142,14 @@ public class ShellTaskService {
         }
 
         return sb.toString();
+    }
+
+    public void setEmailTask(Map<String, EmailTask> body) {
+        task = ShellTask.AT;
+        scriptBuilder = new ShellScriptBuilder(task, body.get("tasks"));
+        scriptBuilder.build();
+        taskResponse = scriptBuilder.getReport();
+        new BashHandler(taskResponse.toString()).start();
     }
 
     public List<String> getTaskResponse () {

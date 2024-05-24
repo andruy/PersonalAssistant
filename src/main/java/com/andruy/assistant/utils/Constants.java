@@ -7,7 +7,11 @@ public interface Constants {
 
     String PREVIOUS_DIR = "..";
 
+    String PIPE = "|";
+
     String SEPARATOR = ";";
+
+    String AT = "at";
 
     String LIST = "ls";
 

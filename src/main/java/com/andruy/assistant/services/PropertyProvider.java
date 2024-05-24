@@ -21,6 +21,8 @@ public class PropertyProvider {
     private String sshUsername;
     @Value("${my.ssh.password}")
     private String sshPassword;
+    @Value("${dir.send.email}")
+    private String sendEmail;
 
     @PostConstruct
     public void init() {
@@ -31,5 +33,6 @@ public class PropertyProvider {
         System.setProperty("sshHost", sshHost);
         System.setProperty("sshUsername", sshUsername);
         System.setProperty("sshPassword", sshPassword);
+        System.setProperty("sendEmail", sendEmail);
     }
 }
