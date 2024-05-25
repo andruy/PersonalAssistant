@@ -11,30 +11,23 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.andruy.assistant.models.EmailTask;
-import com.andruy.assistant.services.EmailService;
+import com.andruy.assistant.services.EmailTaskService;
 
 @Controller
 public class EmailTaskController {
     @Autowired
-    private EmailService emailService;
+    private EmailTaskService emailTaskService;
 
     @GetMapping("/emailtask")
     public ResponseEntity<Map<String, List<String>>> getEmailTasks() {
-        return ResponseEntity.ok().body(Map.of("Email tasks", emailService.getTasks()));
+        // return ResponseEntity.ok().body(Map.of("Email tasks", emailTaskService.getTasks()));
+        return null;
     }
 
     @PostMapping("/emailtask")
     public ResponseEntity<Map<String, String>> emailAgentTest(@RequestBody EmailTask body) {
-        emailService.addTask(body);
-        emailService.taskedEmail(body);
+        emailTaskService.addTask(body);
 
-        String feedback = "Not processed";
-        if (body.getTimeframe() == 1) {
-            feedback = "Email will be sent in " + body.getTimeframe() + " minute";
-        } else {
-            feedback = "Email will be sent in " + body.getTimeframe() + " minutes";
-        }
-
-        return ResponseEntity.ok().body(Map.of("report", feedback));
+        return ResponseEntity.ok().body(Map.of("report", emailTaskService.report()));
     }
 }

@@ -453,7 +453,7 @@ function addToFourthList() {
     taskObj.email.subject = action;
 
     let timeValue = time.value.trim();
-    if (isNaN(Number(timeValue)) || Number(timeValue) < 1) {
+    if (isNaN(Number(timeValue)) || Number(timeValue) < 0) {
         alert("Please enter a value for time greater than zero.");
         return;
     }
