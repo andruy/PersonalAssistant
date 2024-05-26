@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class EmailTask {
-    private int timeframe;
+    private long timeframe;
     private Email email;
 }
