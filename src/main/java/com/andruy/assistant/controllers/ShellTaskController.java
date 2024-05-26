@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.andruy.assistant.models.Directory;
+import com.andruy.assistant.models.EmailTask;
 import com.andruy.assistant.services.ShellTaskService;
 import com.andruy.assistant.utils.DirectoryList;
 
@@ -33,8 +34,14 @@ public class ShellTaskController {
 
     @PostMapping("/yte")
     public ResponseEntity<Map<String, String>> assignDirectories(@RequestBody Map<String, List<String>> body) {
-
         shellTaskService.assignAndProcess(body);
+
+        return ResponseEntity.ok().body(Map.of("report", shellTaskService.getTaskResponse().get(1)));
+    }
+
+    @PostMapping("/emailtask")
+    public ResponseEntity<Map<String, String>> setTask(@RequestBody Map<String, EmailTask> body) {
+        shellTaskService.setEmailTask(body);
 
         return ResponseEntity.ok().body(Map.of("report", shellTaskService.getTaskResponse().get(1)));
     }

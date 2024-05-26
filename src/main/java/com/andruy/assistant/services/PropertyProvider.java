@@ -7,8 +7,6 @@ import jakarta.annotation.PostConstruct;
 
 @Component
 public class PropertyProvider {
-    @Value("${my.email.recipient}")
-    private String receiver;
     @Value("${my.programming.directory}")
     private String programmingDirectory;
     @Value("${my.yt.downloader}")
@@ -34,7 +32,6 @@ public class PropertyProvider {
 
     @PostConstruct
     public void init() {
-        System.setProperty("receiver", receiver);
         System.setProperty("programmingDirectory", programmingDirectory);
         System.setProperty("ytd", ytd);
         System.setProperty("bin", bin);

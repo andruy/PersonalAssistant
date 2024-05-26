@@ -470,7 +470,7 @@ function addToFourthList() {
             }
             let listItem = document.createElement("li");
             listItem.appendChild(document.createTextNode(
-                `Sending email in ${timeValue} ${timeValue > 1 ? "minutes" : "minute"}`
+                `Sending email in ${timeValue} ${(timeValue > 1 || timeValue === 0) ? "minutes" : "minute"}`
             ));
             list.appendChild(listItem);
             // Apply flip-in animation to the new list item
