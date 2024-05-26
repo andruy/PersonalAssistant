@@ -452,14 +452,14 @@ function addToFourthList() {
 
     taskObj.email.subject = action;
 
-    let timeValue = time.value.trim();
-    if (isNaN(Number(timeValue)) || Number(timeValue) < 0) {
-        alert("Please enter a value for time greater than zero.");
+    let timeValue = time.value;
+    if (Date.parse(timeValue) === NaN) {
+        alert("Please enter a value for future time.");
         return;
     }
 
     if (timeValue !== "") {
-        taskObj.timeframe = timeValue;
+        taskObj.timeframe = Date.parse(timeValue);
         time.value = "";
 
         plusButton[3].classList.add("rotate-quarter");
@@ -470,7 +470,11 @@ function addToFourthList() {
             }
             let listItem = document.createElement("li");
             listItem.appendChild(document.createTextNode(
-                `Sending email in ${timeValue} ${timeValue === 1 ? "minute" : "minutes"}`
+                `${action} ${Date.now() > Date.parse(timeValue) ? "(Inmediately)" : "-> " + Date.prototype.toLocaleString.call(new Date(Date.parse(timeValue)))}`
+                    // Otherwise
+                    // "(" + Date.prototype.toLocaleDateString.call(new Date(Date.parse(timeValue)))
+                    // + " at " + Date.prototype.toLocaleTimeString.call(new Date(Date.parse(timeValue))).slice(0, -6)
+                    // + Date.prototype.toLocaleTimeString.call(new Date(Date.parse(timeValue))).slice(-3) + ")"}`
             ));
             list.appendChild(listItem);
             // Apply flip-in animation to the new list item
@@ -482,6 +486,7 @@ function addToFourthList() {
 }
 
 async function sendFourthList() {
+    console.log(taskObj);
     if (taskObj.timeframe === 0) {
         alert("Please enter a value for time greater than zero.");
         return;
@@ -497,7 +502,6 @@ async function sendFourthList() {
     });
     if (response.status === 200) {
         let result = await response.json();
-        console.log(taskObj);
         console.log(result);
         clearFourthList(result.report);
     } else {

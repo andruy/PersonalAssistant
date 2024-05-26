@@ -110,7 +110,8 @@ button {
 }
 
 .mid-modal > input[type=number],
-.mid-modal > input[type=text] {
+.mid-modal > input[type=text],
+.mid-modal > input[type=datetime-local] {
     width: 100%;
 }
 

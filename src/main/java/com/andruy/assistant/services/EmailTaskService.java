@@ -1,5 +1,10 @@
 package com.andruy.assistant.services;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.util.Date;
+
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +23,11 @@ public class EmailTaskService {
     }
 
     public String report() {
-        return task.getTimeframe() == 1 ? "Email will be sent in " + task.getTimeframe() + " minute" :
-        "Email will be sent in " + task.getTimeframe() + " minutes";
+        Date date = new Date(task.getTimeframe());
+        LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalTime localTime = date.toInstant().atZone(ZoneId.systemDefault()).toLocalTime();
+    
+        return task.getTimeframe() < System.currentTimeMillis() ? "Sending email now" :
+            "Sending email on " + localDate + " at " + localTime;
     }
 }
