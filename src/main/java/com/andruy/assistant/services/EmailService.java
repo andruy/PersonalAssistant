@@ -27,8 +27,6 @@ public class EmailService {
     private String host;
     @Value("${my.email.port}")
     private String port;
-    @Value("${my.email.recipient}")
-    private String recipient;
     private Session session;
     private Properties props;
     private Authenticator authenticator;
@@ -40,13 +38,13 @@ public class EmailService {
         props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.host", host);
-        props.put("mail.smtp.port", port);
+        props.put("mail.smtp.host", host == null ? System.getProperty("emailHost") : host);
+        props.put("mail.smtp.port", port == null ? System.getProperty("emailPort") : port);
 
         authenticator = new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(username, password);
+                return new PasswordAuthentication(username == null ? System.getProperty("emailUsername") : username, password == null ? System.getProperty("emailPassword") : password);
             }
         };
 
@@ -58,7 +56,7 @@ public class EmailService {
             Message message = new MimeMessage(session);
 
             // Set From: header field of the header
-            message.setFrom(new InternetAddress(username, name));
+            message.setFrom(new InternetAddress(username == null ? System.getProperty("emailUsername") : username, name));
 
             // Set To: header field of the header
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email.getTo()));
@@ -85,13 +83,13 @@ public class EmailService {
         props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.host", host);
-        props.put("mail.smtp.port", port);
+        props.put("mail.smtp.host", host == null ? System.getProperty("emailHost") : host);
+        props.put("mail.smtp.port", port == null ? System.getProperty("emailPort") : port);
 
         authenticator = new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(username, password);
+                return new PasswordAuthentication(username == null ? System.getProperty("emailUsername") : username, password == null ? System.getProperty("emailPassword") : password);
             }
         };
 
@@ -103,7 +101,7 @@ public class EmailService {
             Message message = new MimeMessage(session);
 
             // Set From: header field of the header
-            message.setFrom(new InternetAddress(username, name));
+            message.setFrom(new InternetAddress(username == null ? System.getProperty("emailUsername") : username, name));
 
             // Set To: header field of the header
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email.getTo()));

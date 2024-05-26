@@ -66,7 +66,7 @@ public class ShellTaskService {
         if (!doNotExist.isEmpty()) {
             new EmailService().sendEmail(
                 new Email(
-                    receiver,
+                    receiver == null ? System.getProperty("emailRecipient") : receiver,
                     "The following directories do not exist today " + LocalDateTime.now().toString().substring(0, 16),
                     doNotExist.toString()
                 )
