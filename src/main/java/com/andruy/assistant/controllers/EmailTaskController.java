@@ -22,7 +22,6 @@ public class EmailTaskController {
     public ResponseEntity<List<String>> getTasks() {
         return ResponseEntity.ok().body(emailTaskService.getTaskTemplate());
     }
-    
 
     @GetMapping("/emailtask")
     public ResponseEntity<Map<String, List<String>>> getEmailTasks() {
