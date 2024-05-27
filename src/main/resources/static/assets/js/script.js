@@ -10,9 +10,12 @@ console.log(
     "\nsearch: " + search
 );
 
+const taskToDestroyEndpoint = "/deletetask";
+const curentScheduledTasks = "/emailtasks";
 const retrieveDirEndpoint = "/ytd";
 const multiListsEndpoint = "/yt";
 const taskArrayEndpoint = "/tasks";
+const sendTaskEndpoint = "/emailtask";
 
 document.onload = getDirectories();
 document.onload = getActions();
@@ -34,6 +37,10 @@ for (let i = 0; i < modalBoxArray.length; i++) {
     openModalButtonArray[i].addEventListener("click", function () {
         modalBoxArray[i].classList.add("scale-in");
         modalBackgroundArray[i].style.display = "grid";
+
+        if (i == 1) {
+            getDirectories();
+        }
     });
 
     closeModalButtonArray[i].addEventListener("click", function () {
@@ -191,6 +198,7 @@ input2.addEventListener("keypress", function (e) {
 });
 
 async function getDirectories() {
+    directoryList.innerHTML = `<option value="" disabled selected hidden>Choose directory...</option>`;
     let response = await fetch(retrieveDirEndpoint);
     let data = await response.json();
 
@@ -427,8 +435,6 @@ function clearThirdList(msg) {
 /**
  * Fourth modal
  */
-const taskEndpoint = "/emailtask";
-
 async function getActions() {
     let response = await fetch(taskArrayEndpoint);
     let data = await response.json();
@@ -470,8 +476,8 @@ function addToFourthList() {
     taskObj.email.subject = action;
 
     let timeValue = time.value;
-    if (Date.parse(timeValue) === NaN) {
-        alert("Please enter a value for future time.");
+    if (Date.parse(timeValue) === NaN || timeValue === "") {
+        alert("Please enter a value for time.");
         return;
     }
 
@@ -510,7 +516,7 @@ async function sendFourthList() {
     }
 
     // Sending the list with AJAX call
-    let response = await fetch(taskEndpoint, {
+    let response = await fetch(sendTaskEndpoint, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -557,6 +563,115 @@ function clearFourthList(msg) {
                 }, 3000 + (backspace * msg.length));
             }, 5000 + (typying * msg.length));
         }, 2500);
+    }, 500);
+}
+
+/**
+ * Fith modal
+ */
+let tasks = [];
+let taskToKill = {};
+
+async function gatherTaskList() {
+    currentTasks.innerHTML = `<option value="" disabled selected hidden> Current tasks...</option>`;
+    let response = await fetch(curentScheduledTasks);
+    let data = await response.json();
+
+    tasks = data;
+    tasks.forEach(task => {
+        let option = document.createElement("option");
+        option.text = task.name + " (" + task.time + ")";
+        option.value = task.id;
+        currentTasks.appendChild(option);
+    })
+}
+
+currentTasks.addEventListener("change", function (e) {
+    if (e.key === "Enter") {
+        addToFithList();
+    }
+});
+
+function addToFithList() {
+    let dropdown = document.getElementById("currentTasks");
+    let task = dropdown.value;
+    if (task === "") {
+        alert("Please select an element from the dropdown.");
+        return;
+    }
+    for (let i = 0; i < tasks.length; i++) {
+        if (tasks[i].id === task) {
+            taskToKill = tasks[i];
+            break;
+        }
+    }
+    console.log(taskToKill);
+
+    plusButton[4].classList.add("rotate-quarter");
+    setTimeout(function () {
+        let list = document.querySelectorAll(".text-list")[4];
+        if (list.hasChildNodes()) {
+            list.innerHTML = "";
+        }
+        let listItem = document.createElement("li");
+        listItem.appendChild(document.createTextNode(taskToKill.name + " (" + taskToKill.time + ")"));
+        list.appendChild(listItem);
+        // Apply flip-in animation to the new list item
+        listItem.classList.add("flip-in");
+
+        plusButton[4].classList.remove("rotate-quarter");
+    }, 300);
+}
+
+async function sendFithList() {
+    if (taskToKill === undefined) {
+        alert("Please select an element from the dropdown.");
+        return;
+    }
+
+    // Sending the list with AJAX call
+    let response = await fetch(taskToDestroyEndpoint, {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(taskToKill)
+    });
+    if (response.status === 200) {
+        let result = await response.json();
+        console.log(result);
+        clearFithList(result.report);
+    } else {
+        alert("Something went wrong");
+    }
+}
+
+function clearFithList(msg) {
+    taskToKill = {};
+
+    let list = document.querySelectorAll(".text-list")[4];
+    let listItemsToClear = list.getElementsByTagName("li");
+    for (let i = 0; i < listItemsToClear.length; i++) {
+        listItemsToClear[i].classList.remove("flip-in");
+        listItemsToClear[i].classList.add("flip-out");
+    }
+
+    // Remove list items after animation completes
+    setTimeout(function () {
+        list.innerHTML = "";
+        let resultText = document.querySelectorAll(".typewriter")[4];
+        resultText.classList.add("show-cursor");
+
+        // Remove the result message after 5 seconds
+        setTimeout(function () {
+            animateTypewriter(resultText, msg, 0)
+
+            // Toggle typewriter cursor off after 2.5s
+            setTimeout(function () {
+                reverseAnimation(resultText, msg, msg.length);
+                resultText.classList.remove("show-cursor");
+            }, 3000 + (backspace * msg.length));
+        }, 5000 + (typying * msg.length));
     }, 500);
 }
 

@@ -1,5 +1,10 @@
 package com.andruy.assistant.models;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.util.Date;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -8,4 +13,12 @@ import lombok.Data;
 public class EmailTask {
     private long timeframe;
     private Email email;
+
+    public String getTime() {
+        Date date = new Date(timeframe);
+        LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalTime localTime = date.toInstant().atZone(ZoneId.systemDefault()).toLocalTime();
+
+        return localDate + " at " + localTime;
+    }
 }

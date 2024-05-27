@@ -73,7 +73,7 @@ select:required:invalid option {
     color: #fff;
 }
 
-#directoryList, #taskList {
+#directoryList, #taskList, #currentTasks {
     width: 100%;
 }
 
