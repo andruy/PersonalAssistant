@@ -81,7 +81,7 @@ public class ShellTaskService {
         List<String> list = body.get("links");
 
         Map<Directory, List<String>> map = new HashMap<>();
-        JSONObject correction = new JSONObject(renameDirectory());
+        JSONObject correction = new JSONObject(renameDirectory()).getJSONObject("RenameDirectory");
 
         for (String url : list) {
             Directory directory = new Directory(getDirectory(url));

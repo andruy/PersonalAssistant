@@ -10,6 +10,13 @@ console.log(
     "\nsearch: " + search
 );
 
+const retrieveDirEndpoint = "/ytd";
+const multiListsEndpoint = "/yt";
+const taskArrayEndpoint = "/tasks";
+
+document.onload = getDirectories();
+document.onload = getActions();
+
 /**
  * Modal handling
  */
@@ -174,8 +181,6 @@ function clearFirstList(msg) {
 /**
  * Second modal
 */
-const retrieveDirEndpoint = "/ytd";
-const multiListsEndpoint = "/yt";
 let treeData = {};
 let input2 = document.querySelectorAll(".textInput")[1];
 
@@ -197,8 +202,6 @@ async function getDirectories() {
         directoryList.appendChild(option);
     });
 }
-
-document.onload = getDirectories();
 
 function addToSecondList() {
     let dropdown = document.getElementById("directoryList");
@@ -425,6 +428,20 @@ function clearThirdList(msg) {
  * Fourth modal
  */
 const taskEndpoint = "/emailtask";
+
+async function getActions() {
+    let response = await fetch(taskArrayEndpoint);
+    let data = await response.json();
+
+    const actions = data;
+    actions.forEach(action => {
+        let option = document.createElement("option");
+        option.text = action;
+        option.value = action;
+        taskList.appendChild(option);
+    });
+}
+
 let taskObj = {
     timeframe: 0,
     email: {
