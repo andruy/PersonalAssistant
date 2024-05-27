@@ -18,6 +18,12 @@ public class EmailTaskController {
     @Autowired
     private EmailTaskService emailTaskService;
 
+    @GetMapping("/tasks")
+    public ResponseEntity<List<String>> getTasks() {
+        return ResponseEntity.ok().body(emailTaskService.getTaskTemplate());
+    }
+    
+
     @GetMapping("/emailtask")
     public ResponseEntity<Map<String, List<String>>> getEmailTasks() {
         // return ResponseEntity.ok().body(Map.of("Email tasks", emailTaskService.getTasks()));

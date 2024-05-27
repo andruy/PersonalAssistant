@@ -20,8 +20,8 @@ public class ShellTaskController {
     private ShellTaskService shellTaskService;
 
     @GetMapping("/ytd")
-    public List<Directory> printDirectories() {
-        return new DirectoryList().getDirectories();
+    public ResponseEntity<List<Directory>> printDirectories() {
+        return ResponseEntity.ok().body(new DirectoryList().getDirectories());
     }
 
     @PostMapping("/yt")
