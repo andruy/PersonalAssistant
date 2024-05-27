@@ -28,6 +28,9 @@
         <div class="glow-box">
             <i class="fa-solid fa-car-battery"></i>
         </div>
+        <div class="glow-box">
+            <i class="fa-solid fa-list"></i>
+        </div>
     </main>
 
     <!-- First modal -->
@@ -125,18 +128,43 @@
                 <div class="mid-modal">
                     <select aria-label="Action" id="taskList" required>
                         <option value="" disabled selected hidden>Choose your destiny...</option>
-                        <!-- <option value="AC on">Turn AC on</option> -->
-                        <!-- <option value="AC off">Turn AC off</option> -->
                     </select>
                 </div>
                 <div class="mid-modal">
-                        <input type="datetime-local" id="time">
+                        <input type="text" placeholder="Enter time" onfocus="this.type='datetime-local'" id="time">
                     <button onclick="addToFourthList()" title="add"><i class="fa-solid fa-plus"></i></button>
                 </div>
             </div>
             <div class="bot-modal">
                 <button class="append-button">Append value</button>
                 <button onclick="sendFourthList()">Send it over</button>
+            </div>
+            <!-- <p class="presenter"></p> -->
+            <ul class="text-list"></ul>
+            <!-- <i class="fa-solid fa-caret-down accordion"></i> -->
+        </div>
+    </div>
+
+    <!-- Fith modal -->
+    <div class="modal-background">
+        <div id="fifth-modal" class="modal">
+            <div class="top-modal">
+                <span class="typewriter"></span>
+                <i class="fa-solid fa-xmark close-modal"></i>
+                <i class="fa-solid fa-left-long go-back" style="display: none;"></i>
+            </div>
+            <h1>Task List</h1>
+            <div class="mid-wrapper">
+                <div class="mid-modal">
+                    <select aria-label="Action" id="currentTasks" required>
+                        <option value="" disabled selected hidden> Current tasks...</option>
+                    </select>
+                    <button onclick="addToFithList()" title="add"><i class="fa-solid fa-plus"></i></button>
+                </div>
+            </div>
+            <div class="bot-modal">
+                <button class="append-button" onclick="gatherTaskList()" title="getList">Show list</button>
+                <button onclick="sendFithList()">Kill task</button>
             </div>
             <!-- <p class="presenter"></p> -->
             <ul class="text-list"></ul>

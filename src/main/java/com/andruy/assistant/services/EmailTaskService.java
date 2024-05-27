@@ -2,29 +2,37 @@ package com.andruy.assistant.services;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import com.andruy.assistant.models.EmailTask;
+import com.andruy.assistant.models.PushNotification;
+import com.andruy.assistant.models.TaskId;
+import com.andruy.assistant.utils.Promise;
 import com.andruy.assistant.utils.TaskHandler;
 
 @Component
 public class EmailTaskService {
+    @Autowired
+    private PushNotificationService pushNotificationService;
     @Value("${dir.corrections}")
     private String dataFile;
     private Scanner scanner;
     private StringBuilder sb;
     private EmailTask task;
+    private String deletionReport;
+
+    public void setTask(EmailTask task) {
+        this.task = task;
+    }
 
     public List<String> getTaskTemplate() {
         List<String> list = new ArrayList<>();
@@ -35,11 +43,19 @@ public class EmailTaskService {
         return list;
     }
 
-    @Async
-    public void addTask(EmailTask task) {
-        this.task = task;
+    public Set<TaskId> getThreads() {
+        return Promise.getThreads().keySet();
+    }
 
-        new TaskHandler(task).execute();
+    @Async
+    public void sendTaskAsync() {
+        new TaskHandler(task);
+    }
+
+    public void deleteThread(TaskId params) {
+        Promise.killThread(params);
+        deletionReport = "Thread " + params.getId() + " killed";
+        pushNotificationService.push(new PushNotification("Suspended", params.getName() + " (" + params.getTime() + ")"));
     }
 
     private String getTaskList() {
@@ -59,11 +75,11 @@ public class EmailTaskService {
     }
 
     public String report() {
-        Date date = new Date(task.getTimeframe());
-        LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        LocalTime localTime = date.toInstant().atZone(ZoneId.systemDefault()).toLocalTime();
-    
         return task.getTimeframe() < System.currentTimeMillis() ? "Sending email now" :
-            "Sending email on " + localDate + " at " + localTime;
+            "Sending email on " + task.getTime();
+    }
+
+    public String getDeletionReport() {
+        return deletionReport;
     }
 }
