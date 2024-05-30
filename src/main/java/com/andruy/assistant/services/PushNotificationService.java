@@ -25,7 +25,7 @@ public class PushNotificationService {
         httpRequest = HttpRequest.newBuilder()
             .header("Title", msg.getTitle())
             .POST(HttpRequest.BodyPublishers.ofString(msg.getBody()))
-            .uri(URI.create(ntfyUrl))
+            .uri(URI.create(ntfyUrl == null ? System.getProperty("ntfyUrl") : ntfyUrl))
             .build();
 
         statusCode = httpClient.sendAsync(httpRequest, BodyHandlers.ofString())

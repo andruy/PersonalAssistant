@@ -29,6 +29,8 @@ public class PropertyProvider {
     private String port;
     @Value("${my.email.recipient}")
     private String recipient;
+    @Value("${my.ntfy.url}")
+    private String ntfyUrl;
 
     @PostConstruct
     public void init() {
@@ -43,5 +45,6 @@ public class PropertyProvider {
         System.setProperty("emailHost", host);
         System.setProperty("emailPort", port);
         System.setProperty("emailRecipient", recipient);
+        System.setProperty("ntfyUrl", ntfyUrl);
     }
 }
