@@ -624,7 +624,7 @@ function addToFithList() {
 }
 
 async function sendFithList() {
-    if (taskToKill === undefined) {
+    if (Object.keys(taskToKill).length === 0) {
         alert("Please select an element from the dropdown.");
         return;
     }
