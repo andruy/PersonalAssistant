@@ -624,8 +624,8 @@ function addToFithList() {
 }
 
 async function sendFithList() {
-    if (taskToKill === undefined) {
-        alert("Please select an element from the dropdown.");
+    if (Object.keys(taskToKill).length === 0) {
+        alert("The list is empty. Please add items to the list first.");
         return;
     }
 
