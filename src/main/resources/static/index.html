@@ -99,9 +99,11 @@
             <h1>Tracker</h1>
             <div class="mid-wrapper">
                 <div class="mid-modal">
-                    <input type="number" id="quantity" placeholder="How many?">
-                    <input type="text" class="textInput" placeholder="Item..." style="display: none;">
-                    <input type="number" id="cost" placeholder="How much?" style="display: none;">
+                    <select aria-label="Function" id="subjectForTask">
+                        <option value="Turn AC on">⏱️</option>
+                        <option value="Turn AC off">🛑</option>
+                    </select>
+                    <input type="number" id="timeForTask" placeholder="How long? (minutes)">
                     <button onclick="addToThirdList()" title="add"><i class="fa-solid fa-plus"></i></button>
                 </div>
             </div>

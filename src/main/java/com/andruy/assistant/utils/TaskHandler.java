@@ -23,21 +23,24 @@ public class TaskHandler extends Thread {
     public void run() {
         try {
             if (task.getTimeframe() < System.currentTimeMillis()) {
-                new EmailService().sendEmail(task.getEmail());
-                System.out.println("Email sent at " + LocalDateTime.now().toString().substring(0, 16));
-                new PushNotificationService().push(new PushNotification(task.getEmail().getSubject(), "Done"));
+                execute();
             } else {
                 TaskId params = new TaskId(UUID.randomUUID().toString(), task.getEmail().getSubject(), task.getTime());
 
                 Promise.add(params, thread);
 
                 Thread.sleep(task.getTimeframe() - System.currentTimeMillis());
-                new EmailService().sendEmail(task.getEmail());
-                System.out.println("Email sent at " + LocalDateTime.now().toString().substring(0, 16));
-                new PushNotificationService().push(new PushNotification(task.getEmail().getSubject(), "Done"));
+
+                execute();
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void execute() {
+        new EmailService().sendEmail(task.getEmail());
+        System.out.println("Email sent at " + LocalDateTime.now().toString().substring(0, 16));
+        new PushNotificationService().push(new PushNotification(task.getEmail().getSubject(), "Done"));
     }
 }

@@ -16,6 +16,7 @@ const retrieveDirEndpoint = "/ytd";
 const multiListsEndpoint = "/yt";
 const taskArrayEndpoint = "/tasks";
 const sendTaskEndpoint = "/emailtask";
+const uniListEndpoint = "/yte";
 
 document.onload = getDirectories();
 document.onload = getActions();
@@ -89,11 +90,11 @@ for (let i = 0; i < modalBoxArray.length; i++) {
 }
 
 const plusButton = document.getElementsByClassName("fa-plus");
+let result = null;
 
 /**
  * First modal
  */
-const singleListEndpoint = "/yte";
 let listItems = [];
 let input1 = document.querySelector(".textInput");
 
@@ -104,6 +105,11 @@ input1.addEventListener("keypress", function (e) {
 });
 
 function addToFirstList() {
+    if (input1.value.trim() === "") {
+        alert("Please enter values for each field.");
+        return;
+    }
+
     let text = input1.value.trim();
     if (text !== "") {
         listItems.push(text);
@@ -123,7 +129,15 @@ function addToFirstList() {
     }
 }
 
-async function sendFirstList() {
+function sendFirstList() {
+    sendFirstListToServer(listItems);
+    if (result == null) {
+        return;
+    }
+    clearFirstList(result.report);
+}
+
+async function sendFirstListToServer() {
     if (listItems.length === 0) {
         alert("The list is empty. Please add items to the list first.");
         return;
@@ -134,7 +148,7 @@ async function sendFirstList() {
     };
 
     // Sending the list with AJAX call
-    let response = await fetch(singleListEndpoint, {
+    let response = await fetch(uniListEndpoint, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -142,10 +156,10 @@ async function sendFirstList() {
         body: JSON.stringify(data)
     });
     if (response.status === 200) {
-        let result = await response.json();
+        result = await response.json();
         console.log(listItems);
         console.log(result);
-        clearFirstList(result.report);
+
     } else {
         alert("Something went wrong");
     }
@@ -162,27 +176,8 @@ function clearFirstList(msg) {
         listItemsToClear[i].classList.add("flip-out");
     }
 
-    // Remove list items after animation completes
-    setTimeout(function () {
-        list.innerHTML = "";
-
-        // Toggle typewriter cursor on for 2.5s
-        let resultText = document.querySelector(".typewriter");
-        resultText.classList.add("show-cursor");
-        setTimeout(function () {
-            animateTypewriter(resultText, msg, 0)
-
-            // Remove the result message after 5 seconds
-            setTimeout(function () {
-                reverseAnimation(resultText, msg, msg.length);
-
-                // Toggle typewriter cursor off after 2.5s
-                setTimeout(function () {
-                    resultText.classList.remove("show-cursor");
-                }, 3000 + (backspace * msg.length));
-            }, 5000 + (typying * msg.length));
-        }, 2500);
-    }, 500);
+    useTypewriter(list, 0, msg);
+    result = null;
 }
 
 /**
@@ -212,6 +207,11 @@ async function getDirectories() {
 }
 
 function addToSecondList() {
+    if (input2.value.trim() === "") {
+        alert("Please enter values for each field.");
+        return;
+    }
+
     let dropdown = document.getElementById("directoryList");
     let chosenDirectory = dropdown.value;
     
@@ -262,7 +262,15 @@ function addToSecondList() {
     }
 }
 
-async function sendSecondList() {
+function sendSecondList() {
+    sendSecondListToServer();
+    if (result == null) {
+        return;
+    }
+    clearSecondList(result.report);
+}
+
+async function sendSecondListToServer() {
     if (Object.keys(treeData).length === 0) {
         alert("The list is empty. Please add items to the list first.");
         return;
@@ -277,10 +285,9 @@ async function sendSecondList() {
         body: JSON.stringify(treeData)
     });
     if (response.status === 200) {
-        let result = await response.json();
+        result = await response.json();
         console.log(treeData);
         console.log(result);
-        clearSecondList(result.report);
     } else {
         alert("Something went wrong");
     }
@@ -296,111 +303,98 @@ function clearSecondList(msg) {
         listItemsToClear[i].classList.add("flip-out");
     }
 
-    // Remove list items after animation completes
-    setTimeout(function () {
-        list.innerHTML = "";
-
-        // Toggle typewriter cursor on for 2.5s
-        let resultText = document.querySelectorAll(".typewriter")[1];
-        resultText.classList.add("show-cursor");
-        setTimeout(function () {
-            animateTypewriter(resultText, msg, 0)
-
-            // Remove the result message after 5 seconds
-            setTimeout(function () {
-                reverseAnimation(resultText, msg, msg.length);
-
-                // Toggle typewriter cursor off after 2.5s
-                setTimeout(function () {
-                    resultText.classList.remove("show-cursor");
-                }, 3000 + (backspace * msg.length));
-            }, 5000 + (typying * msg.length));
-        }, 2500);
-    }, 500);
+    useTypewriter(list, 1, msg);
+    result = null;
 }
 
 /**
  * Third modal
  */
-const mealsEndpoint = "/mealup";
-let mealsList = [];
-let input3 = document.querySelectorAll(".textInput")[2];
-let quantity = document.getElementById("quantity");
-let cost = document.getElementById("cost");
-
-[input3, quantity, cost].forEach(item => {
-    item.addEventListener("keypress", function (e) {
-        if (e.key === "Enter") {
-            addToThirdList();
-        }    
-    });    
-});
-
-function addToThirdList() {
-    let qty = quantity.value.trim();
-    let text = input3.value.trim().toUpperCase();
-    let price = cost.value.trim();
-
-    if (isNaN(Number(qty)) || Number(qty) < 1 ||
-    isNaN(Number(price)) || Number(price) < 1) {
-        alert("Please enter values for quantity and price greater than zero.");
-        return;
-    }
-
-    if (text !== "") {
-        for (let i = 0; i < qty; i++) {
-            mealsList.push(
-                {
-                    name: text,
-                    price: Number(price)
-                }
-            );
-        }
-
-        quantity.value = "";
-        input3.value = ""; // Clear the text input
-        cost.value = "";
-
-        plusButton[2].classList.add("rotate-quarter");
-        setTimeout(function () {
-            let list = document.querySelectorAll(".text-list")[2];
-            let listItem = document.createElement("li");
-            listItem.appendChild(document.createTextNode(`${qty} (Gs. ${price} each) ${text}`));
-            list.appendChild(listItem);
-            // Apply flip-in animation to the new list item
-            listItem.classList.add("flip-in");
-
-            plusButton[2].classList.remove("rotate-quarter");
-        }, 300);
-    }
+let taskList = [];
+let counter = 0;
+let emailTemplate = {
+    to: "andruycira@icloud.com",
+    subject: "",
+    body: "Lorem ipsum"
 }
 
-async function sendThirdList() {
-    if (Object.keys(mealsList).length === 0) {
-        alert("The list is empty. Please add items to the list first.");
+function taskTemplate() {
+    timeframe = 0;
+    email = {};
+}
+
+timeForTask.addEventListener("keypress", function (e) {
+    if (e.key === "Enter") {
+        addToThirdList();
+    }
+});  
+
+function addToThirdList() {
+    if (isNaN(Number(timeForTask.value)) || timeForTask.value === "") {
+        alert("Please enter values for each field.");
         return;
     }
 
-    // Sending the list with AJAX call
-    let response = await fetch(mealsEndpoint, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(mealsList)
-    });
-    if (response.status === 200) {
-        let result = await response.json();
-        console.log(mealsList);
-        console.log(result);
-        clearThirdList(result.report);
-    } else {
-        alert("Something went wrong");
+    let newTask = Object.create(taskTemplate);
+    const theTime = timeForTask.value;
+    const theSubject = subjectForTask.value;
+    newTask.timeframe = minutesToMilliseconds(Number(theTime));
+    newTask.email = Object.assign({}, emailTemplate);
+
+    newTask.email.subject = theSubject;
+
+    timeForTask.value = ""; // Clear the input
+
+    plusButton[2].classList.add("rotate-quarter");
+    setTimeout(function () {
+        let list = document.querySelectorAll(".text-list")[2];
+        let listItem = document.createElement("li");
+
+        theSubject === "Turn AC on" ?
+            listItem.appendChild(document.createTextNode(`AC will start ${pushToTaskList(newTask)}`)) :
+            listItem.appendChild(document.createTextNode(`AC will stop ${pushToTaskList(newTask)}`));
+
+        list.appendChild(listItem);
+        // Apply flip-in animation to the new list item
+        listItem.classList.add("flip-in");
+
+        plusButton[2].classList.remove("rotate-quarter");
+    }, 300);
+}
+
+function minutesToMilliseconds(minutes) {
+    return minutes * 60000;
+}
+
+function pushToTaskList(newTask) {
+    if (taskList.length > 0) {
+        if (taskList[taskList.length - 1].email.subject === "Turn AC on" && newTask.email.subject === "Turn AC on") {
+            newTask.timeframe += minutesToMilliseconds(120);
+        }
+
+        newTask.timeframe += taskList[taskList.length - 1].timeframe;
     }
+    taskList.push(newTask);
+    console.log(taskList);
+
+    return new Date(newTask.timeframe + Date.now()).toLocaleString();
+}    
+
+function sendThirdList() {
+    taskList.forEach(task => {
+        task.timeframe += Date.now();
+    });
+    setTimeout(() => {
+        sendFourthListToServer();
+    }, 1000 * taskList.length);
+    if (result == null) {
+        return;
+    }
+    clearThirdList("Task list has been sent");
 }
 
 function clearThirdList(msg) {
-    mealsList = [];
+    taskList = [];
 
     let list = document.querySelectorAll(".text-list")[2];
     let listItemsToClear = list.getElementsByTagName("li");
@@ -409,27 +403,8 @@ function clearThirdList(msg) {
         listItemsToClear[i].classList.add("flip-out");
     }
 
-    // Remove list items after animation completes
-    setTimeout(function () {
-        list.innerHTML = "";
-
-        // Toggle typewriter cursor on for 2.5s
-        let resultText = document.querySelectorAll(".typewriter")[2];
-        resultText.classList.add("show-cursor");
-        setTimeout(function () {
-            animateTypewriter(resultText, msg, 0)
-
-            // Remove the result message after 5 seconds
-            setTimeout(function () {
-                reverseAnimation(resultText, msg, msg.length);
-
-                // Toggle typewriter cursor off after 2.5s
-                setTimeout(function () {
-                    resultText.classList.remove("show-cursor");
-                }, 3000 + (backspace * msg.length));
-            }, 5000 + (typying * msg.length));
-        }, 2500);
-    }, 500);
+    useTypewriter(list, 2, msg);
+    result = null;
 }
 
 /**
@@ -448,14 +423,6 @@ async function getActions() {
     });
 }
 
-let taskObj = {
-    timeframe: 0,
-    email: {
-        to: "andruycira@icloud.com",
-        subject: "",
-        body: "Lorem ipsum"
-    }
-};
 let time = document.getElementById("time");
 
 time.addEventListener("keypress", function (e) {
@@ -465,6 +432,11 @@ time.addEventListener("keypress", function (e) {
 });
 
 function addToFourthList() {
+    if (time.value === "" || time.value === isNaN(Number(time.value))) {
+        alert("Please select an element from the dropdown.");
+        return;
+    }
+
     let dropdown = document.getElementById("taskList");
     let action = dropdown.value;
 
@@ -472,6 +444,9 @@ function addToFourthList() {
         alert("Please select an element from the dropdown.");
         return;
     }
+
+    let taskObj = Object.create(taskTemplate);
+    taskObj.email = Object.assign({}, emailTemplate);
 
     taskObj.email.subject = action;
 
@@ -508,33 +483,44 @@ function addToFourthList() {
     }
 }
 
-async function sendFourthList() {
-    console.log(taskObj);
-    if (taskObj.timeframe === 0) {
-        alert("Please enter a value for time greater than zero.");
+function sendFourthList() {
+    sendFourthListToServer();
+    if (result == null) {
+        return;
+    }
+    clearFourthList(result.report);
+}
+
+function sendFourthListToServer() {
+    if (taskList.length === 0) {
+        alert("Please add an element to the list.");
         return;
     }
 
-    // Sending the list with AJAX call
-    let response = await fetch(sendTaskEndpoint, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(taskObj)
+    console.log(taskList);
+    taskList.forEach(task => {
+        if (task.timeframe === 0) {
+            alert("Please enter a value for time greater than zero.");
+            return;
+        }
+
+        // Sending the list with AJAX call
+        let response = fetch(sendTaskEndpoint, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(task)
+        });
+        if (response.status === 200) {
+            result = response.json();
+            console.log(result);
+        }
     });
-    if (response.status === 200) {
-        let result = await response.json();
-        console.log(result);
-        clearFourthList(result.report);
-    } else {
-        alert("Something went wrong");
-    }
 }
 
 function clearFourthList(msg) {
-    taskObj.timeframe = 0;
-    taskObj.email.subject = "";
+    taskList = [];
 
     let list = document.querySelectorAll(".text-list")[3];
     let listItemsToClear = list.getElementsByTagName("li");
@@ -543,27 +529,8 @@ function clearFourthList(msg) {
         listItemsToClear[i].classList.add("flip-out");
     }
 
-    // Remove list items after animation completes
-    setTimeout(function () {
-        list.innerHTML = "";
-
-        // Toggle typewriter cursor on for 2.5s
-        let resultText = document.querySelectorAll(".typewriter")[3];
-        resultText.classList.add("show-cursor");
-        setTimeout(function () {
-            animateTypewriter(resultText, msg, 0)
-
-            // Remove the result message after 5 seconds
-            setTimeout(function () {
-                reverseAnimation(resultText, msg, msg.length);
-
-                // Toggle typewriter cursor off after 2.5s
-                setTimeout(function () {
-                    resultText.classList.remove("show-cursor");
-                }, 3000 + (backspace * msg.length));
-            }, 5000 + (typying * msg.length));
-        }, 2500);
-    }, 500);
+    useTypewriter(list, 3, msg);
+    result = null;
 }
 
 /**
@@ -593,6 +560,11 @@ currentTasks.addEventListener("change", function (e) {
 });
 
 function addToFithList() {
+    if (currentTasks.value === "") {
+        alert("Please select an element from the dropdown.");
+        return;
+    }
+
     let dropdown = document.getElementById("currentTasks");
     let task = dropdown.value;
     if (task === "") {
@@ -623,7 +595,15 @@ function addToFithList() {
     }, 300);
 }
 
-async function sendFithList() {
+function sendFithList() {
+    sendFithListToServer();
+    if (result == null) {
+        return;
+    }
+    clearFithList(result.report);
+}
+
+async function sendFithListToServer() {
     if (Object.keys(taskToKill).length === 0) {
         alert("The list is empty. Please add items to the list first.");
         return;
@@ -638,9 +618,8 @@ async function sendFithList() {
         body: JSON.stringify(taskToKill)
     });
     if (response.status === 200) {
-        let result = await response.json();
+        result = await response.json();
         console.log(result);
-        clearFithList(result.report);
     } else {
         alert("Something went wrong");
     }
@@ -656,23 +635,8 @@ function clearFithList(msg) {
         listItemsToClear[i].classList.add("flip-out");
     }
 
-    // Remove list items after animation completes
-    setTimeout(function () {
-        list.innerHTML = "";
-        let resultText = document.querySelectorAll(".typewriter")[4];
-        resultText.classList.add("show-cursor");
-
-        // Remove the result message after 5 seconds
-        setTimeout(function () {
-            animateTypewriter(resultText, msg, 0)
-
-            // Toggle typewriter cursor off after 2.5s
-            setTimeout(function () {
-                reverseAnimation(resultText, msg, msg.length);
-                resultText.classList.remove("show-cursor");
-            }, 3000 + (backspace * msg.length));
-        }, 5000 + (typying * msg.length));
-    }, 500);
+    useTypewriter(list, 4, msg); // Adjust the element index here
+    result = null;
 }
 
 /**
@@ -698,4 +662,29 @@ function reverseAnimation(element, msg, index) {
             reverseAnimation(element, msg, index);
         }, backspace); // Adjust the speed of the reverse effect here
     }
+}
+
+/**
+ * Typewriter functionality
+ */
+function useTypewriter(list, element, msg) {
+    // Remove list items after animation completes
+    setTimeout(function () {
+        list.innerHTML = "";
+
+        // Toggle typewriter cursor on for 2.5s
+        let resultText = document.querySelectorAll(".typewriter")[element];
+        resultText.classList.add("show-cursor");
+
+        // Remove the result message after 5 seconds
+        setTimeout(function () {
+            animateTypewriter(resultText, msg, 0)
+
+            // Toggle typewriter cursor off after 2.5s
+            setTimeout(function () {
+                reverseAnimation(resultText, msg, msg.length);
+                resultText.classList.remove("show-cursor");
+            }, 3000 + (backspace * msg.length));
+        }, 5000 + (typying * msg.length));
+    }, 500);
 }
