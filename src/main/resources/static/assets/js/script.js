@@ -376,6 +376,9 @@ function pushToTaskList(newTask) {
     }
     taskList.push(newTask);
     console.log(taskList);
+    taskList.forEach(task => {
+        console.log(new Date(task.timeframe + Date.now()).toLocaleString());
+    })
 
     return new Date(newTask.timeframe + Date.now()).toLocaleString();
 }    
@@ -384,13 +387,11 @@ function sendThirdList() {
     taskList.forEach(task => {
         task.timeframe += Date.now();
     });
-    setTimeout(() => {
-        sendFourthListToServer();
-    }, 1000 * taskList.length);
+    sendFourthListToServer();
     if (result == null) {
         return;
     }
-    clearThirdList("Task list has been sent");
+    clearThirdList(result.report);
 }
 
 function clearThirdList(msg) {
@@ -491,32 +492,28 @@ function sendFourthList() {
     clearFourthList(result.report);
 }
 
-function sendFourthListToServer() {
+async function sendFourthListToServer() {
     if (taskList.length === 0) {
         alert("Please add an element to the list.");
         return;
     }
 
     console.log(taskList);
-    taskList.forEach(task => {
-        if (task.timeframe === 0) {
-            alert("Please enter a value for time greater than zero.");
-            return;
-        }
 
-        // Sending the list with AJAX call
-        let response = fetch(sendTaskEndpoint, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(task)
-        });
-        if (response.status === 200) {
-            result = response.json();
-            console.log(result);
-        }
+    // Sending the list with AJAX call
+    let response = await fetch(sendTaskEndpoint, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(taskList)
     });
+    if (response.status === 200) {
+        result = await response.json();
+        console.log(result);
+    } else {
+        alert("Something went wrong");
+    }
 }
 
 function clearFourthList(msg) {
