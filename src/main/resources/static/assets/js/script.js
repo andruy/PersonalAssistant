@@ -90,7 +90,6 @@ for (let i = 0; i < modalBoxArray.length; i++) {
 }
 
 const plusButton = document.getElementsByClassName("fa-plus");
-let result = null;
 
 /**
  * First modal
@@ -129,11 +128,8 @@ function addToFirstList() {
     }
 }
 
-function sendFirstList() {
-    sendFirstListToServer(listItems);
-    if (result == null) {
-        return;
-    }
+async function sendFirstList() {
+    const result = await sendFirstListToServer(listItems);
     clearFirstList(result.report);
 }
 
@@ -156,10 +152,10 @@ async function sendFirstListToServer() {
         body: JSON.stringify(data)
     });
     if (response.status === 200) {
-        result = await response.json();
+        let result = await response.json();
         console.log(listItems);
         console.log(result);
-
+        return result;
     } else {
         alert("Something went wrong");
     }
@@ -262,11 +258,8 @@ function addToSecondList() {
     }
 }
 
-function sendSecondList() {
-    sendSecondListToServer();
-    if (result == null) {
-        return;
-    }
+async function sendSecondList() {
+    const result = await sendSecondListToServer();
     clearSecondList(result.report);
 }
 
@@ -285,9 +278,10 @@ async function sendSecondListToServer() {
         body: JSON.stringify(treeData)
     });
     if (response.status === 200) {
-        result = await response.json();
+        let result = await response.json();
         console.log(treeData);
         console.log(result);
+        return result;
     } else {
         alert("Something went wrong");
     }
@@ -383,14 +377,11 @@ function pushToTaskList(newTask) {
     return new Date(newTask.timeframe + Date.now()).toLocaleString();
 }    
 
-function sendThirdList() {
+async function sendThirdList() {
     taskList.forEach(task => {
         task.timeframe += Date.now();
     });
-    sendFourthListToServer();
-    if (result == null) {
-        return;
-    }
+    const result = await sendFourthListToServer()
     clearThirdList(result.report);
 }
 
@@ -484,11 +475,9 @@ function addToFourthList() {
     }
 }
 
-function sendFourthList() {
+async function sendFourthList() {
     sendFourthListToServer();
-    if (result == null) {
-        return;
-    }
+    const result = await sendFourthListToServer();
     clearFourthList(result.report);
 }
 
@@ -509,8 +498,9 @@ async function sendFourthListToServer() {
         body: JSON.stringify(taskList)
     });
     if (response.status === 200) {
-        result = await response.json();
+        let result = await response.json();
         console.log(result);
+        return result;
     } else {
         alert("Something went wrong");
     }
@@ -592,11 +582,8 @@ function addToFithList() {
     }, 300);
 }
 
-function sendFithList() {
-    sendFithListToServer();
-    if (result == null) {
-        return;
-    }
+async function sendFithList() {
+    const result = await sendFithListToServer();
     clearFithList(result.report);
 }
 
@@ -615,8 +602,9 @@ async function sendFithListToServer() {
         body: JSON.stringify(taskToKill)
     });
     if (response.status === 200) {
-        result = await response.json();
+        let result = await response.json();
         console.log(result);
+        return result;
     } else {
         alert("Something went wrong");
     }

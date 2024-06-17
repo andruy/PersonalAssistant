@@ -10,7 +10,6 @@ import java.util.Set;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import com.andruy.assistant.models.EmailTask;
@@ -47,7 +46,6 @@ public class EmailTaskService {
         return Promise.getThreads().keySet();
     }
 
-    @Async
     public void sendTaskAsync() {
         new TaskHandler(task);
     }
