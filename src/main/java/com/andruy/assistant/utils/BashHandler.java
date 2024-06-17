@@ -78,7 +78,7 @@ public final class BashHandler extends Thread {
     private void emailOutput() {
         new EmailService().sendEmail(
             new Email(
-                System.getProperty("recipient"),
+                System.getProperty("emailRecipient"),
                 "Script report for " + LocalDateTime.now().toString().substring(0, 16),
                 report + "\n" + emailReport.toString()
             )
