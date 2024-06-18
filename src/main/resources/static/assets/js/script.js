@@ -403,15 +403,15 @@ function clearThirdList(msg) {
  * Fourth modal
  */
 async function getActions() {
+    taskActions.innerHTML = `<option value="" disabled selected hidden>Choose your destiny...</option>`;
     let response = await fetch(taskArrayEndpoint);
     let data = await response.json();
 
-    const actions = data;
-    actions.forEach(action => {
+    data.forEach(action => {
         let option = document.createElement("option");
         option.text = action;
         option.value = action;
-        taskList.appendChild(option);
+        taskActions.appendChild(option);
     });
 }
 
