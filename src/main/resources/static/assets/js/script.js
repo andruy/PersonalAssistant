@@ -429,7 +429,7 @@ function addToFourthList() {
         return;
     }
 
-    let dropdown = document.getElementById("taskList");
+    let dropdown = document.getElementById("taskActions");
     let action = dropdown.value;
 
     if (action === "") {
