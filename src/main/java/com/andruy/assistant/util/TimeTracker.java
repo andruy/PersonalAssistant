@@ -1,10 +1,9 @@
 package com.andruy.assistant.util;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 
 import org.springframework.stereotype.Component;
-
-import java.time.DayOfWeek;
 
 @Component
 public class TimeTracker {

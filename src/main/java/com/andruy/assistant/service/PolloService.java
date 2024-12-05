@@ -24,7 +24,6 @@ public class PolloService {
     Logger logger = LoggerFactory.getLogger(PolloService.class);
     private final String ADDRESS = "https://www.pollolistens.com/";
     private final String NEXT = "nextPageLink";
-    private final String FROM = "Pollo";
     private final int LONG_HALT = 3000;
     private final int SHORT_HALT = 500;
     private List<WebElement> elements;
@@ -81,7 +80,7 @@ public class PolloService {
             // Rate visit
             elements = driver.findElements(By.className("rating"));
             if (elements.isEmpty()) {
-                // TODO: Handle this case
+                logger.warn("No ratings found");
             }
             actions = new Actions(driver);
             actions.moveToElement(elements.get(elements.size() - 1)).click().perform();
