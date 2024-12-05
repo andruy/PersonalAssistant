@@ -29,4 +29,9 @@ public class BookmarkController {
     public List<Bookmark> findBookmarkByReference(@RequestParam(defaultValue = "") String str) {
         return bookmarkService.findBookmarkByReference(str);
     }
+
+    @GetMapping("/logReader")
+    public ResponseEntity<Map<String, String>> logReader() {
+        return ResponseEntity.ok(bookmarkService.logReader());
+    }
 }

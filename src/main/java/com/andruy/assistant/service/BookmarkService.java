@@ -57,4 +57,21 @@ public class BookmarkService {
 
         return jdbcTemplate.query(Queries.FIND_BY_REFERENCE, new BookmarkRowMapper(), str);
     }
+
+    public Map<String, String> logReader() {
+        StringBuilder sb = new StringBuilder();
+        File log = new File("logs/app.log");
+
+        try {
+            Scanner scanner = new Scanner(log);
+            while (scanner.hasNextLine()) {
+                sb.append(scanner.nextLine()).append("\n");
+            }
+            scanner.close();
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+
+        return Map.of("logs", sb.toString());
+    }
 }
