@@ -57,7 +57,7 @@ public class InstagramService {
     private String password;
 
     public Map<String, String> getFollowers() {
-        logger.debug("Getting followers only");
+        logger.trace("Getting followers only");
         startTime = System.currentTimeMillis();
         date = new Date(startTime);
         getList("followers", false);
@@ -65,7 +65,7 @@ public class InstagramService {
     }
 
     public Map<String, String> getFollowing() {
-        logger.debug("Getting following only");
+        logger.trace("Getting following only");
         startTime = System.currentTimeMillis();
         date = new Date(startTime);
         getList("following", false);
@@ -107,7 +107,7 @@ public class InstagramService {
                                                     .getText().replaceFirst(",", ""));
 
             String filler = target.equals("followers") ? followInt + " " + target : target + " " + followInt;
-            logger.debug("Instagram's original counter shows " + filler);
+            logger.trace("Instagram's original counter shows " + filler);
             List<String> resultList = new ArrayList<>(followInt + 100);
             actions = new Actions(driver);
             actions.moveToElement(element).click().perform();
@@ -167,7 +167,7 @@ public class InstagramService {
                 // Check if new content is loaded or if we've reached the end of the div
                 if (newChildCount > initialChildCount) {
                     initialChildCount = newChildCount; // Update the count of loaded elements
-                    logger.debug("New content loaded, child count: " + newChildCount);
+                    logger.trace("New content loaded, child count: " + newChildCount);
 
                     if (scrollingIterations > 0) {
                         scrollingIterations = 0;
@@ -192,7 +192,7 @@ public class InstagramService {
             for (String s : resultList) {
                 updatedRecords += instagramRepository.saveUser(target.toUpperCase(), s, date);
             }
-            logger.debug("Inserted " + updatedRecords + " records to IG_" + target.toUpperCase() + " table");
+            logger.trace("Inserted " + updatedRecords + " records to IG_" + target.toUpperCase() + " table");
 
             if (target.equals("followers")) {
                 followersList = resultList;
@@ -201,7 +201,7 @@ public class InstagramService {
             }
 
             response = target.equals("followers") ? "You have " + resultList.size() + " " + target : resultList.size() + " are " + target + " you";
-            logger.debug(response);
+            logger.trace(response);
 
             if (comparison) {
                 secondIteration = true;
@@ -232,7 +232,7 @@ public class InstagramService {
                            .collect(Collectors.toList());
 
             response = result.size() + " are not your followers";
-            logger.debug(response);
+            logger.trace(response);
 
             String target = "nmf";
 
@@ -241,9 +241,9 @@ public class InstagramService {
             for (String s : result) {
                 updatedRecords += instagramRepository.saveUser(target.toUpperCase(), s, date);
             }
-            logger.debug("Inserted " + updatedRecords + " records to IG_" + target.toUpperCase() + " table");
+            logger.trace("Inserted " + updatedRecords + " records to IG_" + target.toUpperCase() + " table");
             totalTime = timeTracker.getTotalMinutes(System.currentTimeMillis(), startTime);
-            logger.debug("Total elapsed time: " + totalTime + " minutes");
+            logger.trace("Total elapsed time: " + totalTime + " minutes");
         }
     }
 
@@ -267,7 +267,7 @@ public class InstagramService {
 
     @Async
     public CompletableFuture<Void> deleteAccounts(String suffix, Date oldDate, List<String> list) {
-        logger.debug("Starting to delete accounts dating back to " + oldDate.toString());
+        logger.trace("Starting to delete accounts dating back to " + oldDate.toString());
         startTime = System.currentTimeMillis();
         date = new Date(startTime);
         List<String> listOfDeletedAccounts = new ArrayList<>();
@@ -291,16 +291,16 @@ public class InstagramService {
                     Thread.sleep(SHORT_HALT);
                     map.remove(s);
                     listOfDeletedAccounts.add(s);
-                    logger.debug("Deleted " + s);
+                    logger.trace("Deleted " + s);
                 } else if (element.getText().equals("Follow")) {
-                    logger.debug("You were not following " + s + " anymore");
+                    logger.trace("You were not following " + s + " anymore");
                     map.remove(s);
                     listOfDeletedAccounts.add(s);
                 } else if (element.getText().equals("Requested")) {
                     actions = new Actions(driver);
                     actions.moveToElement(element).click().perform();
                     Thread.sleep(SHORT_HALT);
-                    logger.debug("Had requested to follow " + s + " and it has been reverted");
+                    logger.trace("Had requested to follow " + s + " and it has been reverted");
                     map.remove(s);
                     listOfDeletedAccounts.add(s);
                 }
@@ -319,25 +319,25 @@ public class InstagramService {
             updatedRecords += instagramRepository.saveUser(suffix, entry.getKey(), date);
         }
 
-        logger.debug("Deleted " + listOfDeletedAccounts.size() + " accounts and now there are " + updatedRecords + " records left in IG_" + suffix);
+        logger.trace("Deleted " + listOfDeletedAccounts.size() + " accounts and now there are " + updatedRecords + " records left in IG_" + suffix);
         totalTime = timeTracker.getTotalMinutes(System.currentTimeMillis(), startTime);
-        logger.debug("Total elapsed time: " + totalTime + " minutes");
+        logger.trace("Total elapsed time: " + totalTime + " minutes");
         int status = pushNotificationService.push(new PushNotification("Completed deletion", "Deleted " + listOfDeletedAccounts.size() + " accounts"));
-        logger.debug("Push notification status: " + status);
+        logger.trace("Push notification status: " + status);
 
         return CompletableFuture.completedFuture(null);
     }
 
     public Map<String, String> protectAccounts(String suffix, Date date, List<String> list) {
-        logger.debug("Will protect accounts dating back to " + date.toString());
+        logger.trace("Will protect accounts dating back to " + date.toString());
         int updatedRecords = 0;
         for (String s : list) {
             updatedRecords += instagramRepository.protectAccount(suffix, s, date);
         }
         response = "Protected " + updatedRecords + " accounts";
         int status = pushNotificationService.push(new PushNotification("Process completed", response));
-        logger.debug(response);
-        logger.debug("Push notification status: " + status);
+        logger.trace(response);
+        logger.trace("Push notification status: " + status);
 
         return Map.of("message", response);
     }

@@ -45,9 +45,9 @@ public class PolloService {
             payload.get("visit")
         );
 
-        logger.debug("Pollo code: " + payload.get("code"));
-        logger.debug("Pollo meal: " + payload.get("meal"));
-        logger.debug("Pollo visit: " + payload.get("visit"));
+        logger.trace("Pollo code: " + payload.get("code"));
+        logger.trace("Pollo meal: " + payload.get("meal"));
+        logger.trace("Pollo visit: " + payload.get("visit"));
 
         try {
             int page = 0;
@@ -64,7 +64,7 @@ public class PolloService {
             actions.moveToElement(element).click().perform();
             Thread.sleep(SHORT_HALT);
             driver.findElement(By.id(NEXT)).click();
-            logger.debug("Leaving page " + page++);
+            logger.trace("Leaving page " + page++);
             Thread.sleep(LONG_HALT);
 
             // Enter code
@@ -74,7 +74,7 @@ public class PolloService {
             driver.findElement(By.id("promptInput_665451_3")).sendKeys(body.get(i++));
             Thread.sleep(SHORT_HALT);
             driver.findElement(By.id(NEXT)).click();
-            logger.debug("Leaving page " + page++);
+            logger.trace("Leaving page " + page++);
             Thread.sleep(LONG_HALT);
 
             // Rate visit
@@ -86,7 +86,7 @@ public class PolloService {
             actions.moveToElement(elements.get(elements.size() - 1)).click().perform();
             Thread.sleep(SHORT_HALT);
             driver.findElement(By.id(NEXT)).click();
-            logger.debug("Leaving page " + page++);
+            logger.trace("Leaving page " + page++);
             Thread.sleep(LONG_HALT);
 
             // Select meal
@@ -102,7 +102,7 @@ public class PolloService {
             actions.moveToElement(element).click().perform();
             Thread.sleep(SHORT_HALT);
             driver.findElement(By.id(NEXT)).click();
-            logger.debug("Leaving page " + page++);
+            logger.trace("Leaving page " + page++);
             Thread.sleep(LONG_HALT);
 
             // More ratings
@@ -120,7 +120,7 @@ public class PolloService {
                 }
             }
             driver.findElement(By.id(NEXT)).click();
-            logger.debug("Leaving page " + page++);
+            logger.trace("Leaving page " + page++);
             Thread.sleep(LONG_HALT);
 
             // Visit type
@@ -129,7 +129,7 @@ public class PolloService {
             actions.moveToElement(element).click().perform();
             Thread.sleep(SHORT_HALT);
             driver.findElement(By.id(NEXT)).click();
-            logger.debug("Leaving page " + page++);
+            logger.trace("Leaving page " + page++);
             Thread.sleep(LONG_HALT);
 
             // Age and gender
@@ -141,7 +141,7 @@ public class PolloService {
             actions.moveToElement(element).click().perform();
             Thread.sleep(SHORT_HALT);
             driver.findElement(By.id(NEXT)).click();
-            logger.debug("Leaving page " + page++);
+            logger.trace("Leaving page " + page++);
             Thread.sleep(LONG_HALT);
 
             // Redeem
@@ -149,7 +149,7 @@ public class PolloService {
             element = elements.get(0).findElement(By.tagName("label")).findElement(By.tagName("div")).findElement(By.tagName("div")).findElements(By.tagName("div")).get(3);
             response = element.getText();
             int status = pushNotificationService.push(new PushNotification("Pollo reward code", response));
-            logger.debug("Push notification status: " + status + " with reward code " + response);
+            logger.trace("Push notification status: " + status + " with reward code " + response);
 
             driver.close();
             driver.quit();
