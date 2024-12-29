@@ -6,6 +6,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.sql.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -52,8 +53,8 @@ public class BookmarkService {
         return parser.toBookmarkList(response);
     }
 
-    public List<Bookmark> findAllBookmarks() {
-        return jdbcTemplate.query(Queries.SELECT_ALL, new BookmarkRowMapper());
+    public List<String> findAllBookmarks() {
+        return jdbcTemplate.queryForList("SELECT current_timestamp - pg_postmaster_start_time()", String.class);
     }
 
     public List<Bookmark> findBookmarkByReference(String str) {

@@ -23,7 +23,7 @@ public class BookmarkController {
     }
 
     @GetMapping("/bookmark")
-    public List<Bookmark> findAllBookmarks() {
+    public List<String> findAllBookmarks() {
         return bookmarkService.findAllBookmarks();
     }
 
