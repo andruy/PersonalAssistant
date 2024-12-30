@@ -13,25 +13,25 @@ public class InstagramRepository {
     private JdbcTemplate jdbcTemplate;
 
     public int saveUser(String suffix, String user, Date date) {
-        String query = "INSERT INTO IG_" + suffix + " (ACCOUNT_NAME, RECORDED_ON) VALUES (?, ?)";
+        String query = "INSERT INTO ig_" + suffix + " (ACCOUNT_NAME, RECORDED_ON) VALUES (?, ?)";
 
         return jdbcTemplate.update(query, user, date);
     }
 
     public List<Date> getDates() {
-        String query = "SELECT DISTINCT RECORDED_ON FROM IG_NMF";
+        String query = "SELECT DISTINCT recorded_on FROM ig_nmf";
 
         return jdbcTemplate.queryForList(query, Date.class);
     }
 
     public List<String> getUsers(String suffix, Date date) {
-        String query = "SELECT ACCOUNT_NAME FROM IG_" + suffix + " WHERE TRUNC(RECORDED_ON) = ?";
+        String query = "SELECT ACCOUNT_NAME FROM ig_" + suffix + " WHERE TRUNC(RECORDED_ON) = ?";
 
         return jdbcTemplate.queryForList(query, String.class, date);
     }
 
     public int protectAccount(String suffix, String user, Date date) {
-        String query = "UPDATE IG_" + suffix + " SET PROTECTED = 1 WHERE ACCOUNT_NAME = ? AND TRUNC(RECORDED_ON) = ?";
+        String query = "UPDATE ig_" + suffix + " SET is_protected = 1 WHERE ACCOUNT_NAME = ? AND TRUNC(RECORDED_ON) = ?";
 
         return jdbcTemplate.update(query, user, date);
     }
