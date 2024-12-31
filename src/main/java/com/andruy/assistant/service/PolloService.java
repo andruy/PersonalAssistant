@@ -5,12 +5,10 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.interactions.Actions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,19 +16,21 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.andruy.assistant.model.PushNotification;
+import com.microsoft.playwright.Browser;
+import com.microsoft.playwright.BrowserType;
+import com.microsoft.playwright.Locator;
+import com.microsoft.playwright.Page;
+import com.microsoft.playwright.Playwright;
+
+import oracle.net.aso.c;
 
 @Service
 public class PolloService {
     Logger logger = LoggerFactory.getLogger(PolloService.class);
     private final String ADDRESS = "https://www.pollolistens.com/";
-    private final String NEXT = "nextPageLink";
-    private final int LONG_HALT = 3000;
-    private final int SHORT_HALT = 500;
-    private List<WebElement> elements;
+    private final String MOVING_ON = "Leaving page ";
+    private final String NEXT = "#nextPageLink";
     private String response = "";
-    private WebElement element;
-    private WebDriver driver;
-    private Actions actions;
     @Autowired
     private PushNotificationService pushNotificationService;
 
@@ -49,106 +49,86 @@ public class PolloService {
         logger.trace("Pollo meal: " + payload.get("meal"));
         logger.trace("Pollo visit: " + payload.get("visit"));
 
-        try {
-            int page = 0;
-            int i = 0;
-            ChromeOptions options = new ChromeOptions();
-            options.addArguments("--headless");
-            options.addArguments("--window-size=1600,900");
-            driver = new ChromeDriver(options);
-            driver.get(ADDRESS);
-            Thread.sleep(LONG_HALT);
+        try (Playwright playwright = Playwright.create()) {
+            int iterator = 0;
+            int pageNumber = 0;
+
+            // Launch a browser (Chromium, Firefox, Webkit)
+            Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false));
+
+            // Open a new browser context and page
+            Page page = browser.newPage();
+
+            // Navigate to a website
+            page.navigate(ADDRESS);
 
             // Select language
-            element = driver.findElement(By.id("option_1568944_667416"));
-            actions = new Actions(driver);
-            actions.moveToElement(element).click().perform();
-            Thread.sleep(SHORT_HALT);
-            driver.findElement(By.id(NEXT)).click();
-            logger.trace("Leaving page " + page++);
-            Thread.sleep(LONG_HALT);
+            page.click("//label[@for='option_1568944_667416']");
+            page.click(NEXT);
+            logger.trace(MOVING_ON + pageNumber++);
 
             // Enter code
-            driver.findElement(By.id("promptInput_665451_0")).sendKeys(body.get(i++));
-            driver.findElement(By.id("promptInput_665451_1")).sendKeys(body.get(i++));
-            driver.findElement(By.id("promptInput_665451_2")).sendKeys(body.get(i++));
-            driver.findElement(By.id("promptInput_665451_3")).sendKeys(body.get(i++));
-            Thread.sleep(SHORT_HALT);
-            driver.findElement(By.id(NEXT)).click();
-            logger.trace("Leaving page " + page++);
-            Thread.sleep(LONG_HALT);
+            page.fill("#promptInput_665451_0", body.get(iterator++));
+            page.fill("#promptInput_665451_1", body.get(iterator++));
+            page.fill("#promptInput_665451_2", body.get(iterator++));
+            page.fill("#promptInput_665451_3", body.get(iterator++));
+            page.click(NEXT);
+            logger.trace(MOVING_ON + pageNumber++);
 
             // Rate visit
-            Thread.sleep(LONG_HALT);
-            elements = driver.findElements(By.className("rating"));
-            if (elements.isEmpty()) {
-                logger.warn("No ratings found");
-            }
-            actions = new Actions(driver);
-            actions.moveToElement(elements.get(elements.size() - 1)).click().perform();
-            Thread.sleep(SHORT_HALT);
-            driver.findElement(By.id(NEXT)).click();
-            logger.trace("Leaving page " + page++);
-            Thread.sleep(LONG_HALT);
+            page.locator(".rating").last().click();
+            page.click(NEXT);
+            logger.trace(MOVING_ON + pageNumber++);
 
             // Select meal
-            elements = driver.findElements(By.className("booleanText"));
-            for (WebElement e : elements) {
-                element = e.findElement(By.className("text")).findElement(By.className("ng-binding"));
-                if (element.getText().contains(body.get(i))) {
-                    i++;
-                    break;
-                }
-            }
-            actions = new Actions(driver);
-            actions.moveToElement(element).click().perform();
-            Thread.sleep(SHORT_HALT);
-            driver.findElement(By.id(NEXT)).click();
-            logger.trace("Leaving page " + page++);
-            Thread.sleep(LONG_HALT);
+            page.click("//*[@id=\"prompt_670287\"]/label/div");
+            page.click(NEXT);
+            logger.trace(MOVING_ON + pageNumber++);
 
             // More ratings
-            JavascriptExecutor js = (JavascriptExecutor) driver;
-            Long viewportHeight = (Long) js.executeScript("return window.innerHeight;");
-
-            elements = driver.findElements(By.className("rating"));
-            for (WebElement e : elements) {
-                if (e.findElement(By.tagName("div")).getText().equals("5")) {
-                    actions = new Actions(driver);
-                    actions.moveToElement(e).click().perform();
-                    long scrollHeight = viewportHeight / 5;
-                    js.executeScript("window.scrollBy(0, arguments[0]);", scrollHeight);
-                    Thread.sleep(SHORT_HALT);
+            Locator elements = page.locator(".rating");
+            for (int i = 0; i < elements.count(); i++) {
+                if (elements.nth(i).locator("div").textContent().equals("5")) {
+                    elements.nth(i).click();
+                    page.evaluate("window.scrollBy(0, window.innerHeight / 5)");
                 }
             }
-            driver.findElement(By.id(NEXT)).click();
-            logger.trace("Leaving page " + page++);
-            Thread.sleep(LONG_HALT);
+            page.click(NEXT);
+            logger.trace(MOVING_ON + pageNumber++);
 
             // Visit type
-            element = driver.findElement(By.id(body.get(i).contains("Dine") ? "option_1547526_658917" : "option_1547528_658917"));
-            actions = new Actions(driver);
-            actions.moveToElement(element).click().perform();
-            Thread.sleep(SHORT_HALT);
-            driver.findElement(By.id(NEXT)).click();
-            logger.trace("Leaving page " + page++);
-            Thread.sleep(LONG_HALT);
+            page.click(body.get(iterator).contains("Dine") ? "#option_1547526_658917" : "#option_1547528_658917");
+            page.click(NEXT);
+            logger.trace(MOVING_ON + pageNumber++);
 
             // Age and gender
-            element = driver.findElement(By.id("option_1576812_670283"));
-            actions = new Actions(driver);
-            actions.moveToElement(element).click().perform();
-            element = driver.findElement(By.id("option_1576818_670286"));
-            actions = new Actions(driver);
-            actions.moveToElement(element).click().perform();
-            Thread.sleep(SHORT_HALT);
-            driver.findElement(By.id(NEXT)).click();
-            logger.trace("Leaving page " + page++);
-            Thread.sleep(LONG_HALT);
+            page.click("#option_1576812_670283");
+            page.click("#option_1576818_670286");
+            page.click(NEXT);
+            logger.trace(MOVING_ON + pageNumber++);
 
             // Redeem
-            elements = driver.findElements(By.className("text"));
-            element = elements.get(0).findElement(By.tagName("label")).findElement(By.tagName("div")).findElement(By.tagName("div")).findElements(By.tagName("div")).get(3);
+            page.locator(".text").first().locator("label");
+
+            // Close the browser
+            browser.close();
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            response = "Something went wrong";
+        }
+
+        return CompletableFuture.completedFuture(null);
+    }
+
+    @Async
+    public CompletableFuture<Void> oldPollo(Map<String, String> payload) {
+        try {
+            ChromeOptions options = new ChromeOptions();
+            WebDriver driver = new ChromeDriver(options);
+
+            // Redeem
+            List<WebElement> elements = driver.findElements(By.className("text"));
+            WebElement element = elements.get(0).findElement(By.tagName("label")).findElement(By.tagName("div")).findElement(By.tagName("div")).findElements(By.tagName("div")).get(3);
             response = element.getText();
             int status = pushNotificationService.push(new PushNotification("Pollo reward code", response));
             logger.trace("Push notification status: " + status + " with reward code " + response);
@@ -157,8 +137,6 @@ public class PolloService {
             driver.quit();
         } catch (Exception e) {
             logger.error(e.getMessage());
-            driver.close();
-            driver.quit();
             response = "Something went wrong";
         }
 
