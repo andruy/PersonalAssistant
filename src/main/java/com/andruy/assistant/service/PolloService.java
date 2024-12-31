@@ -79,6 +79,7 @@ public class PolloService {
             Thread.sleep(LONG_HALT);
 
             // Rate visit
+            Thread.sleep(LONG_HALT);
             elements = driver.findElements(By.className("rating"));
             if (elements.isEmpty()) {
                 logger.warn("No ratings found");
