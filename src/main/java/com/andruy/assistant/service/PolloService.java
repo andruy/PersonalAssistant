@@ -54,6 +54,7 @@ public class PolloService {
             int i = 0;
             ChromeOptions options = new ChromeOptions();
             options.addArguments("--headless");
+            options.addArguments("--window-size=1600,900");
             driver = new ChromeDriver(options);
             driver.get(ADDRESS);
             Thread.sleep(LONG_HALT);
