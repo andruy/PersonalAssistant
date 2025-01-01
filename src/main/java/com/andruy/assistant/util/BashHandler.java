@@ -53,11 +53,11 @@ public final class BashHandler extends Thread {
         execute();
         emailReport.append("Running script...\n");
 
-        if (output.size() == 0) {
+        if (output.size() == 0 && input[0].equals("./script.sh")) {
             emailReport.append("No output\n");
             System.out.println("Something went wrong");
             emailOutput();
-        } else {
+        } else if (output.size() > 0 && input[0].equals("./script.sh")) {
             for (int i = 0; i < output.size() - 1; i++) {
                 if (output.get(i).startsWith("[d") && output.get(i).contains("ETA")) {
                     continue;
@@ -66,6 +66,11 @@ public final class BashHandler extends Thread {
             }
             emailReport.append("Completed: " + output.get(output.size() - 1));
             System.out.println("Task complete");
+            emailOutput();
+        } else if (output.size() > 0) {
+            for (String s : output) {
+                emailReport.append(s + "\n");
+            }
             emailOutput();
         }
     }

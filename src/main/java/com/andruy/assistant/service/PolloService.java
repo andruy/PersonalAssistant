@@ -113,7 +113,7 @@ public class PolloService {
             );
 
             logger.error(e.getMessage());
-            logger.debug("Screenshot saved at: " + path);
+            logger.debug("Saved file " + path);
         } finally {
             browser.close();
             playwright.close();

@@ -14,4 +14,6 @@ public interface Constants {
     String PWD = "pwd";
 
     String DATE = "date";
+
+    String MAKE_DIR = "mkdir";
 }
