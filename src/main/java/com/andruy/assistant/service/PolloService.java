@@ -4,11 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,11 +13,8 @@ import org.springframework.stereotype.Service;
 import com.andruy.assistant.model.PushNotification;
 import com.microsoft.playwright.Browser;
 import com.microsoft.playwright.BrowserType;
-import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
-
-import oracle.net.aso.c;
 
 @Service
 public class PolloService {
@@ -30,7 +22,6 @@ public class PolloService {
     private final String ADDRESS = "https://www.pollolistens.com/";
     private final String MOVING_ON = "Leaving page ";
     private final String NEXT = "#nextPageLink";
-    private String response = "";
     @Autowired
     private PushNotificationService pushNotificationService;
 
@@ -50,8 +41,9 @@ public class PolloService {
         logger.trace("Pollo visit: " + payload.get("visit"));
 
         try (Playwright playwright = Playwright.create()) {
-            int iterator = 0;
+            String response = "None";
             int pageNumber = 0;
+            int iterator = 0;
 
             // Launch a browser (Chromium, Firefox, Webkit)
             Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false));
@@ -77,6 +69,7 @@ public class PolloService {
 
             // Rate visit
             page.locator(".rating").last().click();
+            page.fill("#commentArea_658912", "Great service!");
             page.click(NEXT);
             logger.trace(MOVING_ON + pageNumber++);
 
@@ -86,58 +79,36 @@ public class PolloService {
             logger.trace(MOVING_ON + pageNumber++);
 
             // More ratings
-            Locator elements = page.locator(".rating");
-            for (int i = 0; i < elements.count(); i++) {
-                if (elements.nth(i).locator("div").textContent().equals("5")) {
-                    elements.nth(i).click();
-                    page.evaluate("window.scrollBy(0, window.innerHeight / 5)");
-                }
-            }
+            page.click("//label[@for='option_1576789_670275']");
+            page.click("//label[@for='option_1576799_670277']");
+            page.click("//label[@for='option_1576784_670274']");
+            page.click("//label[@for='option_1576794_670276']");
+            page.click("//label[@for='option_1576804_670278']");
+            page.click("//label[@for='option_1576809_670280']");
             page.click(NEXT);
             logger.trace(MOVING_ON + pageNumber++);
 
             // Visit type
-            page.click(body.get(iterator).contains("Dine") ? "#option_1547526_658917" : "#option_1547528_658917");
+            page.click(body.get(iterator).contains("Dine") ? "//label[@for='option_1547526_658917']" : "//label[@for='option_1547528_658917']");
             page.click(NEXT);
             logger.trace(MOVING_ON + pageNumber++);
 
             // Age and gender
-            page.click("#option_1576812_670283");
-            page.click("#option_1576818_670286");
+            page.click("//label[@for='option_1576812_670283']");
+            page.click("//label[@for='option_1576818_670286']");
             page.click(NEXT);
             logger.trace(MOVING_ON + pageNumber++);
 
             // Redeem
-            page.locator(".text").first().locator("label");
+            response = page.locator("//*[@id=\"promptText_658911\"]/div/span/span/label/div/div/div[4]").textContent();
+            if (pushNotificationService.push(new PushNotification("Pollo reward code", response)) == 200) {
+                logger.trace("Returned reward code: " + response);
+            }
 
             // Close the browser
             browser.close();
         } catch (Exception e) {
             logger.error(e.getMessage());
-            response = "Something went wrong";
-        }
-
-        return CompletableFuture.completedFuture(null);
-    }
-
-    @Async
-    public CompletableFuture<Void> oldPollo(Map<String, String> payload) {
-        try {
-            ChromeOptions options = new ChromeOptions();
-            WebDriver driver = new ChromeDriver(options);
-
-            // Redeem
-            List<WebElement> elements = driver.findElements(By.className("text"));
-            WebElement element = elements.get(0).findElement(By.tagName("label")).findElement(By.tagName("div")).findElement(By.tagName("div")).findElements(By.tagName("div")).get(3);
-            response = element.getText();
-            int status = pushNotificationService.push(new PushNotification("Pollo reward code", response));
-            logger.trace("Push notification status: " + status + " with reward code " + response);
-
-            driver.close();
-            driver.quit();
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            response = "Something went wrong";
         }
 
         return CompletableFuture.completedFuture(null);
