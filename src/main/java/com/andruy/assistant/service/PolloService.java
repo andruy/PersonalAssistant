@@ -1,5 +1,7 @@
 package com.andruy.assistant.service;
 
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -40,18 +42,15 @@ public class PolloService {
         logger.trace("Pollo meal: " + payload.get("meal"));
         logger.trace("Pollo visit: " + payload.get("visit"));
 
-        try (Playwright playwright = Playwright.create()) {
+        Playwright playwright = Playwright.create();
+        Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(true));
+        Page page = browser.newPage();
+
+        try {
             String response = "None";
             int pageNumber = 0;
             int iterator = 0;
 
-            // Launch a browser (Chromium, Firefox, Webkit)
-            Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false));
-
-            // Open a new browser context and page
-            Page page = browser.newPage();
-
-            // Navigate to a website
             page.navigate(ADDRESS);
 
             // Select language
@@ -105,10 +104,19 @@ public class PolloService {
                 logger.trace("Returned reward code: " + response);
             }
 
-            // Close the browser
-            browser.close();
         } catch (Exception e) {
+            String path = "screenshots/" + LocalDateTime.now().toString().replace(":", "").substring(0, 15) + ".png";
+            page.screenshot(
+                new Page.ScreenshotOptions()
+                        .setPath(Paths.get(path))
+                        .setFullPage(true)
+            );
+
             logger.error(e.getMessage());
+            logger.debug("Screenshot saved at: " + path);
+        } finally {
+            browser.close();
+            playwright.close();
         }
 
         return CompletableFuture.completedFuture(null);
