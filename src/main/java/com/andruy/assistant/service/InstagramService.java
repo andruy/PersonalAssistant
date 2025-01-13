@@ -339,7 +339,7 @@ public class InstagramService {
         logger.trace(response);
         logger.trace("Push notification status: " + status);
 
-        return Map.of("message", response);
+        return Map.of("report", response);
     }
 
     private String convertToLink(String str) {

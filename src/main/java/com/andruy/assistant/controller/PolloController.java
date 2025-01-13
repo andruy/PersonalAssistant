@@ -16,7 +16,7 @@ public class PolloController {
     private PolloService polloService;
     @PostMapping("/pollo")
     public ResponseEntity<Map<String, String>> pollo(@RequestBody Map<String, String> payload) {
-        polloService.pollo(payload);
-        return ResponseEntity.ok(Map.of("message", "Now processing..."));
+        String response = polloService.pollo(payload);
+        return ResponseEntity.ok(Map.of("report", response));
     }
 }

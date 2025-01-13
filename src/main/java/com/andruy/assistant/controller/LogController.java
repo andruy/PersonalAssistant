@@ -12,10 +12,10 @@ import com.andruy.assistant.service.LogService;
 @RestController
 public class LogController {
     @Autowired
-    private LogService bookmarkService;
+    private LogService logService;
 
     @GetMapping("/logReader")
     public ResponseEntity<Map<String, String>> logReader() {
-        return ResponseEntity.ok(bookmarkService.logReader());
+        return ResponseEntity.ok(logService.logReader());
     }
 }

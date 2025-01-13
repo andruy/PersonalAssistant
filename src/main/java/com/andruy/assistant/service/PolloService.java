@@ -4,12 +4,10 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.andruy.assistant.model.PushNotification;
@@ -21,14 +19,16 @@ import com.microsoft.playwright.Playwright;
 @Service
 public class PolloService {
     Logger logger = LoggerFactory.getLogger(PolloService.class);
+    @Autowired
+    private PushNotificationService pushNotificationService;
+    private final String EMAIL = "andruydev@outlook.com";
+    private final String FEEDBACK = "Great service!";
     private final String ADDRESS = "https://www.pollolistens.com/";
     private final String MOVING_ON = "Leaving page ";
     private final String NEXT = "#nextPageLink";
-    @Autowired
-    private PushNotificationService pushNotificationService;
 
-    @Async
-    public CompletableFuture<Void> pollo(Map<String, String> payload) {
+    public String pollo(Map<String, String> payload) {
+        String serverResponse = "None";
         List<String> body = List.of(
             payload.get("code").substring(0, 4),
             payload.get("code").substring(4, 8),
@@ -66,9 +66,14 @@ public class PolloService {
             page.click(NEXT);
             logger.trace(MOVING_ON + pageNumber++);
 
+            // Enter email
+            page.fill("#promptInput_909664", EMAIL);
+            page.click(NEXT);
+            logger.trace(MOVING_ON + pageNumber++);
+
             // Rate visit
             page.locator(".rating").last().click();
-            page.fill("#commentArea_658912", "Great service!");
+            page.fill("#commentArea_658912", FEEDBACK);
             page.click(NEXT);
             logger.trace(MOVING_ON + pageNumber++);
 
@@ -104,21 +109,23 @@ public class PolloService {
                 logger.trace("Returned reward code: " + response);
             }
 
+            serverResponse = "Processed";
         } catch (Exception e) {
-            String path = "screenshots/" + LocalDateTime.now().toString().replace(":", "").substring(0, 15) + ".png";
+            String fileName = LocalDateTime.now().toString().replace(":", "").substring(0, 15) + ".png";
             page.screenshot(
                 new Page.ScreenshotOptions()
-                        .setPath(Paths.get(path))
+                        .setPath(Paths.get("screenshots/" + fileName))
                         .setFullPage(true)
             );
 
             logger.error(e.getMessage());
-            logger.debug("Saved file " + path);
+            logger.debug("Saved screenshot " + fileName);
+            serverResponse = "Error";
         } finally {
             browser.close();
             playwright.close();
         }
 
-        return CompletableFuture.completedFuture(null);
+        return serverResponse;
     }
 }
