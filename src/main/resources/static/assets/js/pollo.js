@@ -48,6 +48,6 @@ async function sendPostRequest(endpoint) {
     });
     const data = await response.json();
 
-    console.log(data.message);
-    return data.message;
+    console.log(data.report);
+    return data.report;
 }

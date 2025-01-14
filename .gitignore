@@ -1,6 +1,7 @@
 HELP.md
 target/
 logs/
+screenshots/
 Wallet_UY6CXD5X4HWYCHM1/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/

@@ -1,41 +1,34 @@
 package com.andruy.assistant.service;
 
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.interactions.Actions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.andruy.assistant.model.PushNotification;
+import com.microsoft.playwright.Browser;
+import com.microsoft.playwright.BrowserType;
+import com.microsoft.playwright.Page;
+import com.microsoft.playwright.Playwright;
 
 @Service
 public class PolloService {
     Logger logger = LoggerFactory.getLogger(PolloService.class);
-    private final String ADDRESS = "https://www.pollolistens.com/";
-    private final String NEXT = "nextPageLink";
-    private final int LONG_HALT = 3000;
-    private final int SHORT_HALT = 500;
-    private List<WebElement> elements;
-    private String response = "";
-    private WebElement element;
-    private WebDriver driver;
-    private Actions actions;
     @Autowired
     private PushNotificationService pushNotificationService;
+    private final String EMAIL = "andruydev@outlook.com";
+    private final String FEEDBACK = "Great service!";
+    private final String ADDRESS = "https://www.pollolistens.com/";
+    private final String MOVING_ON = "Leaving page ";
+    private final String NEXT = "#nextPageLink";
 
-    @Async
-    public CompletableFuture<Void> pollo(Map<String, String> payload) {
+    public String pollo(Map<String, String> payload) {
+        String serverResponse = "None";
         List<String> body = List.of(
             payload.get("code").substring(0, 4),
             payload.get("code").substring(4, 8),
@@ -49,119 +42,90 @@ public class PolloService {
         logger.trace("Pollo meal: " + payload.get("meal"));
         logger.trace("Pollo visit: " + payload.get("visit"));
 
+        Playwright playwright = Playwright.create();
+        Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(true));
+        Page page = browser.newPage();
+
         try {
-            int page = 0;
-            int i = 0;
-            ChromeOptions options = new ChromeOptions();
-            options.addArguments("--headless");
-            options.addArguments("--window-size=1600,900");
-            driver = new ChromeDriver(options);
-            driver.get(ADDRESS);
-            Thread.sleep(LONG_HALT);
+            String response = "None";
+            int pageNumber = 0;
+            int iterator = 0;
+
+            page.navigate(ADDRESS);
 
             // Select language
-            element = driver.findElement(By.id("option_1568944_667416"));
-            actions = new Actions(driver);
-            actions.moveToElement(element).click().perform();
-            Thread.sleep(SHORT_HALT);
-            driver.findElement(By.id(NEXT)).click();
-            logger.trace("Leaving page " + page++);
-            Thread.sleep(LONG_HALT);
+            page.click("//label[@for='option_1568944_667416']");
+            page.click(NEXT);
+            logger.trace(MOVING_ON + pageNumber++);
 
             // Enter code
-            driver.findElement(By.id("promptInput_665451_0")).sendKeys(body.get(i++));
-            driver.findElement(By.id("promptInput_665451_1")).sendKeys(body.get(i++));
-            driver.findElement(By.id("promptInput_665451_2")).sendKeys(body.get(i++));
-            driver.findElement(By.id("promptInput_665451_3")).sendKeys(body.get(i++));
-            Thread.sleep(SHORT_HALT);
-            driver.findElement(By.id(NEXT)).click();
-            logger.trace("Leaving page " + page++);
-            Thread.sleep(LONG_HALT);
+            page.fill("#promptInput_665451_0", body.get(iterator++));
+            page.fill("#promptInput_665451_1", body.get(iterator++));
+            page.fill("#promptInput_665451_2", body.get(iterator++));
+            page.fill("#promptInput_665451_3", body.get(iterator++));
+            page.click(NEXT);
+            logger.trace(MOVING_ON + pageNumber++);
+
+            // Enter email
+            page.fill("#promptInput_909664", EMAIL);
+            page.click(NEXT);
+            logger.trace(MOVING_ON + pageNumber++);
 
             // Rate visit
-            Thread.sleep(LONG_HALT);
-            elements = driver.findElements(By.className("rating"));
-            if (elements.isEmpty()) {
-                logger.warn("No ratings found");
-            }
-            actions = new Actions(driver);
-            actions.moveToElement(elements.get(elements.size() - 1)).click().perform();
-            Thread.sleep(SHORT_HALT);
-            driver.findElement(By.id(NEXT)).click();
-            logger.trace("Leaving page " + page++);
-            Thread.sleep(LONG_HALT);
+            page.locator(".rating").last().click();
+            page.fill("#commentArea_658912", FEEDBACK);
+            page.click(NEXT);
+            logger.trace(MOVING_ON + pageNumber++);
 
             // Select meal
-            elements = driver.findElements(By.className("booleanText"));
-            for (WebElement e : elements) {
-                element = e.findElement(By.className("text")).findElement(By.className("ng-binding"));
-                if (element.getText().contains(body.get(i))) {
-                    i++;
-                    break;
-                }
-            }
-            actions = new Actions(driver);
-            actions.moveToElement(element).click().perform();
-            Thread.sleep(SHORT_HALT);
-            driver.findElement(By.id(NEXT)).click();
-            logger.trace("Leaving page " + page++);
-            Thread.sleep(LONG_HALT);
+            page.click("//*[@id=\"prompt_670287\"]/label/div");
+            page.click(NEXT);
+            logger.trace(MOVING_ON + pageNumber++);
 
             // More ratings
-            JavascriptExecutor js = (JavascriptExecutor) driver;
-            Long viewportHeight = (Long) js.executeScript("return window.innerHeight;");
-
-            elements = driver.findElements(By.className("rating"));
-            for (WebElement e : elements) {
-                if (e.findElement(By.tagName("div")).getText().equals("5")) {
-                    actions = new Actions(driver);
-                    actions.moveToElement(e).click().perform();
-                    long scrollHeight = viewportHeight / 5;
-                    js.executeScript("window.scrollBy(0, arguments[0]);", scrollHeight);
-                    Thread.sleep(SHORT_HALT);
-                }
-            }
-            driver.findElement(By.id(NEXT)).click();
-            logger.trace("Leaving page " + page++);
-            Thread.sleep(LONG_HALT);
+            page.click("//label[@for='option_1576789_670275']");
+            page.click("//label[@for='option_1576799_670277']");
+            page.click("//label[@for='option_1576784_670274']");
+            page.click("//label[@for='option_1576794_670276']");
+            page.click("//label[@for='option_1576804_670278']");
+            page.click("//label[@for='option_1576809_670280']");
+            page.click(NEXT);
+            logger.trace(MOVING_ON + pageNumber++);
 
             // Visit type
-            element = driver.findElement(By.id(body.get(i).contains("Dine") ? "option_1547526_658917" : "option_1547528_658917"));
-            actions = new Actions(driver);
-            actions.moveToElement(element).click().perform();
-            Thread.sleep(SHORT_HALT);
-            driver.findElement(By.id(NEXT)).click();
-            logger.trace("Leaving page " + page++);
-            Thread.sleep(LONG_HALT);
+            page.click(body.get(iterator).contains("Dine") ? "//label[@for='option_1547526_658917']" : "//label[@for='option_1547528_658917']");
+            page.click(NEXT);
+            logger.trace(MOVING_ON + pageNumber++);
 
             // Age and gender
-            element = driver.findElement(By.id("option_1576812_670283"));
-            actions = new Actions(driver);
-            actions.moveToElement(element).click().perform();
-            element = driver.findElement(By.id("option_1576818_670286"));
-            actions = new Actions(driver);
-            actions.moveToElement(element).click().perform();
-            Thread.sleep(SHORT_HALT);
-            driver.findElement(By.id(NEXT)).click();
-            logger.trace("Leaving page " + page++);
-            Thread.sleep(LONG_HALT);
+            page.click("//label[@for='option_1576812_670283']");
+            page.click("//label[@for='option_1576818_670286']");
+            page.click(NEXT);
+            logger.trace(MOVING_ON + pageNumber++);
 
             // Redeem
-            elements = driver.findElements(By.className("text"));
-            element = elements.get(0).findElement(By.tagName("label")).findElement(By.tagName("div")).findElement(By.tagName("div")).findElements(By.tagName("div")).get(3);
-            response = element.getText();
-            int status = pushNotificationService.push(new PushNotification("Pollo reward code", response));
-            logger.trace("Push notification status: " + status + " with reward code " + response);
+            response = page.locator("//*[@id=\"promptText_658911\"]/div/span/span/label/div/div/div[4]").textContent();
+            if (pushNotificationService.push(new PushNotification("Pollo reward code", response)) == 200) {
+                logger.trace("Returned reward code: " + response);
+            }
 
-            driver.close();
-            driver.quit();
+            serverResponse = "Processed";
         } catch (Exception e) {
+            String fileName = LocalDateTime.now().toString().replace(":", "").substring(0, 15) + ".png";
+            page.screenshot(
+                new Page.ScreenshotOptions()
+                        .setPath(Paths.get("screenshots/" + fileName))
+                        .setFullPage(true)
+            );
+
             logger.error(e.getMessage());
-            driver.close();
-            driver.quit();
-            response = "Something went wrong";
+            logger.debug("Saved screenshot " + fileName);
+            serverResponse = "Error";
+        } finally {
+            browser.close();
+            playwright.close();
         }
 
-        return CompletableFuture.completedFuture(null);
+        return serverResponse;
     }
 }

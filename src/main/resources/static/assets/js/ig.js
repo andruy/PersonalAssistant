@@ -21,9 +21,9 @@ async function collectData() {
     const data = await response.json();
 
     if (response.ok) {
-        console.log(data.message);
+        console.log(data.report);
         const pre = document.createElement("pre");
-        pre.textContent = JSON.stringify(data.message, null, 2);
+        pre.textContent = JSON.stringify(data.report, null, 2);
         document.body.innerHTML = "";
         document.body.appendChild(pre);
         setTimeout(() => {
@@ -157,9 +157,9 @@ async function protectAccounts(list) {
     const data = await response.json();
 
     if (response.ok) {
-        console.log(data.message);
+        console.log(data.report);
         const pre = document.createElement("pre");
-        pre.textContent = JSON.stringify(data.message, null, 2);
+        pre.textContent = JSON.stringify(data.report, null, 2);
         document.body.innerHTML = "";
         document.body.appendChild(pre);
         setTimeout(() => {
@@ -188,9 +188,9 @@ async function deleteAccounts(list) {
     const data = await response.json();
 
     if (response.ok) {
-        console.log(data.message);
+        console.log(data.report);
         const pre = document.createElement("pre");
-        pre.textContent = JSON.stringify(data.message, null, 2);
+        pre.textContent = JSON.stringify(data.report, null, 2);
         document.body.innerHTML = "";
         document.body.appendChild(pre);
         setTimeout(() => {

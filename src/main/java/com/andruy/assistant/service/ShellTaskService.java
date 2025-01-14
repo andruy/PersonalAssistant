@@ -17,6 +17,7 @@ import java.util.Scanner;
 import java.util.Map.Entry;
 
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +34,8 @@ public class ShellTaskService {
     private String receiver;
     @Value("${dir.corrections}")
     private String dataFile;
+    @Autowired
+    private EmailService emailService;
     private Map<Directory, List<String>> doNotExist;
     private ShellScriptBuilder scriptBuilder;
     private List<Directory> directories;
@@ -63,7 +66,7 @@ public class ShellTaskService {
         }
 
         if (!doNotExist.isEmpty()) {
-            new EmailService().sendEmail(
+            emailService.sendEmail(
                 new Email(
                     receiver == null ? System.getProperty("emailRecipient") : receiver,
                     "The following directories do not exist today " + LocalDateTime.now().toString().substring(0, 16),

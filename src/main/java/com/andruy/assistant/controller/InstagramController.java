@@ -33,7 +33,7 @@ public class InstagramController {
     @GetMapping("/compare")
     public ResponseEntity<Map<String, String>> getFollowersComparison() {
         instagramService.getComparison();
-        return ResponseEntity.ok(Map.of("message", "You will be notified when the task is done"));
+        return ResponseEntity.ok(Map.of("report", "You will be notified when the task is done"));
     }
 
     @GetMapping("/listOfDates")
@@ -49,7 +49,7 @@ public class InstagramController {
     @DeleteMapping("/deleteAccounts")
     public ResponseEntity<Map<String, String>> deleteAccounts(@RequestParam("date") Date date, @RequestBody List<String> list) {
         instagramService.deleteAccounts("NMF", date, list);
-        return ResponseEntity.ok(Map.of("message", "You will be notified when the task is done"));
+        return ResponseEntity.ok(Map.of("report", "You will be notified when the task is done"));
     }
 
     @PutMapping("/protectAccounts")
