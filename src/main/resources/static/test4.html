@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Green Squares Animation</title>
+  <style>
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .square {
+      width: 50px;
+      height: 50px;
+      background-color: green;
+      margin: 0 10px;
+      opacity: 0;
+      animation: fadeInOut 1s infinite;
+    }
+
+    @keyframes fadeInOut {
+      0%, 100% {
+        opacity: 0;
+      }
+      50% {
+        opacity: 1;
+      }
+    }
+
+    .square:nth-child(1) {
+      animation-delay: 0.1s;
+    }
+
+    .square:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .square:nth-child(3) {
+      animation-delay: 0.3s;
+    }
+
+    /* Add more nth-child rules for additional squares */
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="square"></div>
+    <div class="square"></div>
+    <div class="square"></div>
+    <!-- Add more square elements for additional squares -->
+  </div>
+</body>
+</html>
