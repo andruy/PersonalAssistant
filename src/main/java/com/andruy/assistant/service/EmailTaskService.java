@@ -26,7 +26,12 @@ public class EmailTaskService {
     private String dataFile;
     private Scanner scanner;
     private StringBuilder sb;
+    private EmailTask task;
     private String deletionReport;
+
+    public void setTask(EmailTask task) {
+        this.task = task;
+    }
 
     public List<String> getTaskTemplate() {
         List<String> list = new ArrayList<>();
@@ -41,7 +46,7 @@ public class EmailTaskService {
         return Promise.getThreads().keySet();
     }
 
-    public void sendTaskAsync(EmailTask task) {
+    public void sendTaskAsync() {
         new TaskHandler(task);
     }
 
@@ -65,6 +70,11 @@ public class EmailTaskService {
         }
 
         return sb.toString();
+    }
+
+    public String report() {
+        return task.getTimeframe() < System.currentTimeMillis() ? "Sending email now" :
+            "Sending email on " + task.getTime();
     }
 
     public String getDeletionReport() {
