@@ -26,6 +26,6 @@ public class LogService {
             logger.error(e.getMessage());
         }
 
-        return Map.of("logs", sb.toString());
+        return Map.of("report", sb.toString());
     }
 }
